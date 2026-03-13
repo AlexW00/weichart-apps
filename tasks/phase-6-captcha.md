@@ -84,9 +84,11 @@ Clicking `Cancel` closes the popup immediately and returns the entire scene to t
 
 ### Cat reaction while modal is open
 
-As soon as the popup opens, the cat changes from `cat-sleeping.svg` to `cat-wake.svg` in exactly the same world position on the planet surface. The cat looks alert while the popup is present.
+The cat **remains sleeping** while the popup is first opened. The sleeping cat is what is visible in the modal design reference.
 
-If the popup closes via `Cancel`, the cat returns to the sleeping variant.
+The cat wakes up (swaps from `cat-sleeping.svg` to `cat-wake.svg`) when the user **hovers** the forbidden red button. The hover is enough — the cat reacts to the threat. The cat stays awake from that moment onward: through the press, loading state, countdown, and rocket launch.
+
+If the popup closes via `Cancel` (and the user never hovered the button), the cat remains sleeping — no state change. If the cat already woke due to hover, it returns to sleeping when Cancel is clicked.
 
 ---
 
@@ -262,7 +264,7 @@ This path should only be allowed once per page session unless the page is reload
 | `button.png`         | 558×245 px | Default state of the forbidden red button                   |
 | `button-hovered.png` | 549×165 px | Hover state of the forbidden red button                     |
 | `button-pressed.png` | 549×93 px  | Pressed state of the forbidden red button                   |
-| `cat-wake.svg`       | 78×27 px   | Cat awake while popup, countdown, and launch are active     |
+| `cat-wake.svg`       | 78×27 px   | Cat awake from forbidden-button press through end of launch  |
 | `cat-sleeping.svg`   | 85×27 px   | Cat sleeping in default and finished states                 |
 | `rocket.svg`         | 64×196 px  | Rocket launching upward during the sequence                 |
 | `rocket-thrust.svg`  | 472×900 px | Narrow thrust flame aligned under the rocket during liftoff |
@@ -291,10 +293,10 @@ After implementation, verify in the browser:
 
 1. Clicking `Subscribe` opens a centered popup matching the design, using `capcha.png` as the frame
 2. The popup appears above the existing space scene rather than replacing it
-3. As soon as the popup opens, the cat changes from sleeping to awake
-4. The red button shows its default, hover, and pressed image states correctly
+3. The cat remains sleeping when the popup first opens
+4. The red button shows its default, hover, and pressed image states correctly; **hovering the button wakes the cat** (swaps to `cat-wake.svg`)
 5. The three red button assets stay bottom-aligned when switching states, with no vertical jump
-6. Clicking `Cancel` closes the popup, returns the cat to sleeping, and leaves the rocket and form unchanged
+6. Clicking `Cancel` closes the popup and returns the cat to sleeping (whether or not hover triggered the wake)
 7. Clicking the red button shows `Sigh... I knew it...` for about 3 seconds
 8. After the loading text, the popup disappears and a visible `3`, `2`, `1` countdown appears at changing positions around the rocket
 9. During countdown and launch, scrolling is locked and cannot interrupt the sequence

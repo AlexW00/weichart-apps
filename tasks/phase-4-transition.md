@@ -24,7 +24,7 @@ The tree lifts off. The entire `tree-colored.png` image — trunk, canopy, ASCII
 
 Because the tree is tall and narrow in its trunk section, and because the canopy disappears above the viewport edge early in the animation, what the viewer sees for most of the transition is just the trunk: a tall pinkish-salmon column shooting upward. This is the visual metaphor — a rocket body ascending.
 
-**Rocket thrust:** At the moment the tree begins moving — the very first beat of the launch — `rocket-thrust.svg` materializes below the tree. The thrust asset is a tall, narrow flame shape — its width matches the trunk of the tree, which occupies roughly the center fifth of the tree image (approximately 1/5 of the 793px asset width, so around 160px). It is not wide or spreading; it is a tight, focused column of exhaust aligned directly under the trunk. Despite its narrow width, it is roughly a full viewport height tall. It depicts colorful rocket exhaust: cool blue at the very top (where it meets the base of the trunk), blending down through purple and orange into yellow and red at the pointed bottom tip. Visually it reads unmistakably as rocket exhaust fire.
+**Rocket thrust:** At the moment the tree begins moving — the very first beat of the launch — `rocket-thrust.svg` materializes below the tree. The thrust asset is a tall, narrow flame shape — its width matches the trunk of the tree, which occupies roughly the center fifth of the tree image (approximately 1/5 of the 793px asset width, so around 160px). It is not wide or spreading; it is a tight, focused column of exhaust aligned directly under the trunk. Despite its narrow width, it is roughly a full viewport height tall. It depicts colorful rocket exhaust: cool blue at the very top (where it meets the base of the trunk), blending down through white, then yellow, then orange, into red at the pointed bottom tip. Visually it reads unmistakably as rocket exhaust fire.
 
 The thrust appears centered horizontally directly beneath the trunk, almost kissing the base of the tree. As the tree rises, the thrust rises with it, always below the trunk base — as though attached to the bottom of the rocket. The thrust does not appear before the launch moment; before that point it is absent entirely.
 
@@ -36,7 +36,7 @@ By the midpoint of the transition the tree's entire vertical reach has moved abo
 
 The moment the launch begins, Alex detaches from the scene.
 
-For this transition, Alex appears in a different pose: `human-base-handsup.svg` — the same small black line-drawn stickman, but with arms raised overhead in a surprised or exhilarated gesture. `face.png` is still attached at the top of the stickman body, exactly as in Level 2 — a small circular face photo sitting atop the hands-up silhouette.
+For this transition, Alex appears in a different pose: `human-base-handsup.svg` — the same small black line-drawn stickman, but with arms raised overhead in a surprised or exhilarated gesture. `face.png` is still attached at the top of the stickman body, exactly as in Level 2 — the face photo sitting atop the hands-up silhouette.
 
 Alex rockets toward the upper-right corner of the viewport. As he travels, three things happen simultaneously:
 
@@ -150,7 +150,7 @@ Add transition styles to `src/style.css`, appended after the Level 2 rules.
 
 After implementation, verify in the browser by scrolling slowly through the transition section:
 
-1. At the very start of the section, the scene looks like Level 2 end-state — tree trunk centered, cream background, Alex to the right in hands-up pose with watering can (no face photo)
+1. At the very start of the section, the scene looks like Level 2 end-state — tree trunk centered, cream background, Alex to the right in hands-up pose with face photo and watering can
 2. The first scroll movement causes the tree to begin rising upward smoothly
 3. At the launch beat, the rocket thrust appears beneath the tree — a tall colorful flame centered under the trunk
 4. Alex and watering can simultaneously begin moving toward the upper-right, shrinking and rotating as they go

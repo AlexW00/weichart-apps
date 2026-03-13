@@ -16,17 +16,21 @@ After this phase, `npm run dev` should show a complete, visually correct Level 0
 
 ### Background
 
-The entire viewport is filled with a solid sky-blue color (`#E1F7FF`). This is the base layer — everything else sits on top of it.
+The Level 0 section itself has a **solid cream background** (`#FEFEF4`) — the same color as the rest of the page. The sky-blue color (`#E1F7FF`) only appears in the **cloud band area at the top**, not across the whole viewport.
 
-### Cloud strip (top edge)
+Implement this by giving the cloud band container its own background gradient rather than the whole section: the cloud band div has a `linear-gradient` from `#E1F7FF` at 0% to `#FEFEF4` at 100% (or transparent), covering roughly the top 130–160px of the viewport. This way the blue fades into cream right at the bottom of the cloud zone, and the rest of the page below is solid cream. There is no full-page gradient.
 
-At the very top edge of the viewport, spanning the full width, is a horizontal marquee strip of repeating cloud images. Use `cloud-colored.png` (390×274px) — a hand-drawn, ASCII-art-style cloud rendering (not photorealistic).
+### Cloud band (top edge)
 
-The cloud image is repeated side by side many times to form a continuous horizontal band that extends well beyond the viewport width. This strip animates slowly and continuously from left to right, creating an infinite scrolling loop. One full cycle takes about 35 seconds. The loop must be seamless — no visible jump or gap when it wraps.
+At the very top edge of the viewport, spanning the full width, is a **staggered two-row cloud pattern** using `cloud-colored.png` (390×274px) — a hand-drawn, ASCII-art-style cloud rendering (not photorealistic).
 
-Each cloud is rendered at roughly 1/3 of its original height, so about 130px tall on desktop. The sky color shows through between the cloud shapes (they have transparent backgrounds). The strip is purely decorative and does not respond to clicks.
+The design shows two offset rows of clouds rather than a single flat strip: the first row sits at the top edge, and the second row is vertically offset downward by roughly half a cloud height and horizontally offset so the clouds fall in the gaps of the first row, creating a staggered, more natural-looking cloud cover.
 
-When the user eventually scrolls down to later levels, this cloud strip simply scrolls out of view along with the rest of Level 0 — it is not pinned or sticky.
+Both rows animate slowly and continuously from right to left (or left to right — consistent with the design) creating an infinite scrolling loop. One full cycle takes about 35 seconds. The loop must be seamless — no visible jump or gap when it wraps. The two rows may animate at very slightly different speeds to reinforce depth.
+
+Each cloud is rendered at roughly 1/3 of its original height, so about 130px tall on desktop. The gradient background shows through between the cloud shapes (they have transparent backgrounds). The band is purely decorative and does not respond to clicks.
+
+When the user scrolls down to later levels, this cloud band scrolls out of view along with the rest of Level 0 — it is not pinned or sticky.
 
 ### Branding text (upper-middle)
 
@@ -34,7 +38,7 @@ Centered horizontally in the scene, positioned about one-third of the way down f
 
 **Wordmark:** The word "Weichart" in large serif text (Instrument Serif Regular, black). It is very prominent — about 120px font size on desktop, roughly 8–10% of viewport height. Just the word, no decoration or underline.
 
-**Subtitle:** Directly below the wordmark, with only a small gap (about 4px), is "Apps for Humans" in smaller italic serif text (Instrument Serif Italic, about 28px on desktop). "Apps for " is black. The word "Humans" is olive-green (`#808C27`). After "Humans" there is a blinking text cursor character (`|`), also in olive-green.
+**Subtitle:** Directly below the wordmark, with only a small gap (about 4px), is "Apps for Humans" in smaller italic serif text (Instrument Serif Italic, about 28px on desktop). "Apps for " is black. The word "Humans" is olive-green (`#808C27`) with a text underline (`text-decoration: underline`). After "Humans" there is a blinking text cursor character (`|`), also in olive-green (no underline on the cursor).
 
 The subtitle is right-aligned to the wordmark — meaning the right edge of the subtitle text aligns with the right edge of "Weichart" above it. Both are horizontally centered as a group within the viewport. To achieve this, wrap the wordmark and subtitle in a shared container that is centered, with children right-aligned within it.
 
@@ -83,10 +87,10 @@ At this level the icons are just static previews — they are not interactive. T
 
 ### Layering (back to front)
 
-1. Sky-blue background
+1. Sky-to-cream gradient background
 2. Tree image (contains the canopy shape, dashed border, and ASCII art decorations — all baked into the PNG)
 3. App icons row (positioned on top of the tree's canopy area)
-4. Cloud marquee strip (floats above most things at the top of the viewport)
+4. Cloud band — two staggered rows at the top of the viewport
 5. Branding text — wordmark and subtitle (always readable, in front of everything)
 
 ---
@@ -122,7 +126,7 @@ At this level the icons are just static previews — they are not interactive. T
 - Background: `#E1F7FF` (sky blue)
 - Wordmark text: black
 - Subtitle prefix ("Apps for "): black
-- Typed word ("Humans" etc.) and cursor: `#808C27` (olive green)
+- Typed word ("Humans" etc.) and cursor: `#808C27` (olive green); typed word has `text-decoration: underline`; cursor does not
 - Icon background: white
 
 ---
@@ -145,7 +149,7 @@ After implementation, visually confirm in the browser:
 1. Entire viewport is sky-blue (`#E1F7FF`)
 2. Cloud strip scrolls slowly and seamlessly at the top edge
 3. "Weichart" is large, centered, serif, black, about one-third down
-4. "Apps for Humans" sits directly below, right-aligned to wordmark, with olive-green "Humans" and blinking cursor
+4. "Apps for Humans" sits directly below, right-aligned to wordmark, with olive-green underlined "Humans" and blinking cursor (cursor is not underlined)
 5. Typing animation cycles correctly: Humans → Menschen → 人間 → Humans → ...
 6. Tree is centered, canopy visible from mid-viewport up, trunk clipped below viewport — the canopy's green blob, dashed border, and ASCII art decorations are all visible as part of the tree image
 7. Three small icons visible inside the canopy in a row, positioned on top of the tree image

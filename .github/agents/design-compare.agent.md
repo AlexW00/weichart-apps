@@ -3,7 +3,7 @@ name: "Design Comparator"
 description: "Use when comparing a design file (from designs/) to a live browser page. Invoke with a design name (e.g. level-0) and a URL (e.g. localhost:5173/about). Visually diffs the reference design PNG against a Playwright screenshot and returns an exhaustive, code-free description of every visual difference so a blind calling agent knows exactly what to change."
 tools: [vscode, execute, read, search, "playwright/*"]
 user-invocable: true
-model: GPT-5.4 (copilot)
+model: Claude Sonnet 4.6 (copilot)
 argument-hint: "Design name and URL, e.g. 'Compare design level-0 to http://localhost:5173/'"
 ---
 

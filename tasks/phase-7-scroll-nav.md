@@ -98,8 +98,19 @@ The control consists of two circular buttons stacked vertically or otherwise gro
 
 - one button moves upward through the story
 - one button moves downward through the story
-- each button contains a simple arrow or chevron shape
+- each button contains a simple arrow or chevron shape pointing up or down respectively, drawn with CSS borders (no image assets)
 - the control is CSS-only; no image assets are used
+
+**Specific style guidance** (these buttons do not appear in any design file — implement as follows):
+
+- Each button: `36px` diameter circle
+- Background: `rgba(255, 255, 255, 0.15)` (subtly visible across all level backgrounds)
+- Border: `1.5px solid rgba(255, 255, 255, 0.6)`
+- Arrow/chevron: CSS border trick, white, about `8px` wide
+- Gap between buttons: `8px`
+- Position: `fixed`, `bottom: 24px`, `right: 20px`
+- On Level 0 (sky blue) and Level 1/2 (cream), the white border may be subtle — acceptable; the cursor change still signals interactivity
+- Disabled state: `opacity: 0.25`, `pointer-events: none`
 
 The buttons should feel understated but always available. They are a utility layer, not a hero visual element.
 

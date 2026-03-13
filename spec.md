@@ -84,7 +84,7 @@ If any required asset is missing, the gap should be flagged explicitly rather th
 
 Additional elements drawn with CSS/SVG (no dedicated asset file):
 
-- Tree canopy shape: green radial gradient fill, dashed border, squiggly line decorations (drawn over the tree asset)
+- Tree canopy shape: green fill, dashed border, and ASCII art decorations — all baked into the `tree-colored.png` asset; no CSS overlay, gradient, or separate decoration elements are needed
 - "Weichart" wordmark: rendered in Instrument Serif Regular
 - "Apps for Humans" subtitle: rendered in Instrument Serif Italic, with blinking cursor and typing animation; the word "Humans" is colored `#808C27`
 - Sky background: solid `#E1F7FF`; page light background: `#FEFEF4`; space/dark background: `#000000`

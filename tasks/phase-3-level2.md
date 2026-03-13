@@ -96,12 +96,12 @@ The speech bubble and the "This is Alex" arrow label share a gentle floating ani
 
 On the far left side of the viewport, in the lower portion of the scene, stands a signpost. `signpost.svg` (92×157px) is rendered at about 70–90px wide. It's a simple line-drawn post with a rectangular sign face at the top.
 
-On the sign face, the word **"Garden"** is displayed as a CSS text overlay (not baked into the SVG) in serif font (Instrument Serif Regular, about 14–16px). The text is centered on the sign face area.
+The sign face contains a `<` symbol baked into the SVG — no CSS text overlay is needed.
 
 **Interactions:**
 
 - The signpost has `cursor: pointer` to indicate it's clickable.
-- **Hover:** The "Garden" text gains an underline.
+- **Hover:** The signpost image gains a slight brightness increase (e.g., `filter: brightness(1.4)`) to signal interactivity.
 - **Click/tap:** Opens `https://alexanderweichart.de` in a new tab (`target="_blank"`, with `rel="noopener noreferrer"`).
 
 ### Flowers (bottom-left, near signpost)
@@ -120,7 +120,7 @@ The flowers are static — no animation, no interaction. They are purely decorat
 4. Flowers (bottom-left, near signpost base)
 5. Signpost (left side, above flowers)
 6. Alex's body (stickman SVG, right of trunk)
-7. Alex's head (face photo, circular crop, on top of body)
+7. Alex's head (face photo, as-is, on top of body)
 8. Watering can (at Alex's hand level, tilted, animated)
 9. Water drops (falling from the can's spout)
 10. Arrow + "This is Alex" text label (above Alex)
@@ -156,7 +156,6 @@ The flowers are static — no animation, no interaction. They are purely decorat
 ## Fonts Used
 
 - **Instrument Serif Italic** — "This is Alex" label text, speech bubble quote text
-- **Instrument Serif Regular** — "Garden" text on the signpost
 
 ## Colors
 
@@ -173,7 +172,7 @@ The flowers are static — no animation, no interaction. They are purely decorat
 
 Implement in `src/levels/level2.ts` following the architecture from Phase 0:
 
-- `create()` — builds and returns the entire Level 2 DOM subtree (section element with all children: tree trunk, canopy peek, Alex figure composed of head + body + watering can, water drops container, arrow with label text, speech bubble with text area, signpost with "Garden" overlay, flowers)
+- `create()` — builds and returns the entire Level 2 DOM subtree (section element with all children: tree trunk, canopy peek, Alex figure composed of head + body + watering can, water drops container, arrow with label text, speech bubble with text area, signpost (clickable, `<` baked into SVG), flowers)
 - `register(scrollContainer)` — starts the entry animations (arrow + label fade-in/slide), begins the speech bubble typing animation with a randomly chosen quote, starts the continuous floating motion on the speech bubble and arrow, starts the watering can rocking animation and water drop cascade, sets up click/hover listeners on the signpost
 
 Add Level 2 styles to `src/style.css`, appended after the Level 1 rules.
@@ -194,8 +193,8 @@ After implementation, visually confirm in the browser:
 8. Arrow and label animate in on level activation (fade + slide down)
 9. Speech bubble is visible to the right of Alex with a randomly selected quote typing in letter-by-letter
 10. Speech bubble and arrow label float gently up and down in a continuous bobbing motion
-11. Signpost is visible on the far left with "Garden" text on its sign face
-12. Hovering the signpost underlines "Garden"; clicking opens `https://alexanderweichart.de` in a new tab
+11. Signpost is visible on the far left with the `<` symbol on its sign face (baked into the SVG — no text overlay)
+12. Hovering the signpost brightens the image; clicking opens `https://alexanderweichart.de` in a new tab
 13. Two or three small flowers sit near the base of the signpost
 14. Layer order correct: speech bubble and arrow in front, Alex in front of trunk, signpost and flowers in front of background
 15. On mobile (≤768px): all elements scale down, speech bubble repositions for narrow screens, signpost stays left-anchored, nothing overflows

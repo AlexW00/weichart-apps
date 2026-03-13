@@ -65,7 +65,7 @@ When the user moves their cursor over an app icon, two things happen simultaneou
 
 ### 1. Icon emphasis
 
-The hovered icon scales up slightly — about 1.05× its normal size — and its box shadow becomes slightly stronger/deeper. This gives tactile feedback that the icon is interactive. The scale and shadow changes should animate smoothly (about 200–300ms ease).
+The hovered icon scales up slightly — about 1.05× its normal size — gains a small tilt/rotation (about 3–5°, direction can vary per icon) — and its box shadow becomes slightly stronger/deeper. This gives tactile feedback that the icon is interactive. The scale, rotation, and shadow changes should animate smoothly (about 200–300ms ease).
 
 ### 2. Label area appears
 
@@ -172,7 +172,7 @@ After implementation, visually confirm in the browser:
 4. Three app icons are large (~130px), horizontally centered, with gaps between them
 5. Icons have white backgrounds, rounded corners, and subtle shadows
 6. Zeitgeist icon (center) is visually distinct with its dark background
-7. Hovering an icon: icon scales up slightly, shadow deepens
+7. Hovering an icon: icon scales up slightly, tilts slightly, shadow deepens
 8. Hovering an icon: label area appears in the upper canopy with correct app name and description
 9. Moving hover between icons: label transitions smoothly between app data
 10. Leaving hover: label fades out
