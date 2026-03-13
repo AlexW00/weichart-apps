@@ -155,30 +155,34 @@ export function registerSharedLayers(scrollContainer: HTMLElement): void {
 	// ====== BACKGROUND ======
 
 	// L0 (sky) → L1 (cream)
-	gsap.timeline({
-		scrollTrigger: {
-			trigger: "#level-1",
-			scroller: scrollContainer,
-			start: "top bottom",
-			end: "top top",
-			scrub: true,
-		},
-	}).fromTo(
-		bgLayer,
-		{ backgroundColor: "#e1f7ff" },
-		{ backgroundColor: "#fefef4", ease: "none" },
-	);
+	gsap
+		.timeline({
+			scrollTrigger: {
+				trigger: "#level-1",
+				scroller: scrollContainer,
+				start: "top bottom",
+				end: "top top",
+				scrub: true,
+			},
+		})
+		.fromTo(
+			bgLayer,
+			{ backgroundColor: "#e1f7ff" },
+			{ backgroundColor: "#fefef4", ease: "none" },
+		);
 
 	// Transition: cream → black
-	gsap.timeline({
-		scrollTrigger: {
-			trigger: "#transition-2-3",
-			scroller: scrollContainer,
-			start: "top top",
-			end: "bottom bottom",
-			scrub: true,
-		},
-	}).to(bgLayer, { backgroundColor: "#000000", ease: "none" });
+	gsap
+		.timeline({
+			scrollTrigger: {
+				trigger: "#transition-2-3",
+				scroller: scrollContainer,
+				start: "top top",
+				end: "bottom bottom",
+				scrub: true,
+			},
+		})
+		.to(bgLayer, { backgroundColor: "#000000", ease: "none" });
 
 	bgLayer.style.backgroundColor = "#e1f7ff";
 
@@ -193,49 +197,55 @@ export function registerSharedLayers(scrollContainer: HTMLElement): void {
 	});
 
 	// L0 → L1: zoom into canopy
-	gsap.timeline({
-		scrollTrigger: {
-			trigger: "#level-1",
-			scroller: scrollContainer,
-			start: "top bottom",
-			end: "top top",
-			scrub: true,
-		},
-	}).to(treeLayer, {
-		top: "-15%",
-		width: "130vw",
-		yPercent: 0,
-		ease: "none",
-	});
+	gsap
+		.timeline({
+			scrollTrigger: {
+				trigger: "#level-1",
+				scroller: scrollContainer,
+				start: "top bottom",
+				end: "top top",
+				scrub: true,
+			},
+		})
+		.to(treeLayer, {
+			top: "-15%",
+			width: "130vw",
+			yPercent: 0,
+			ease: "none",
+		});
 
 	// L1 → L2: keep 130vw, slide up to bottom-aligned (trunk visible)
-	gsap.timeline({
-		scrollTrigger: {
-			trigger: "#level-2",
-			scroller: scrollContainer,
-			start: "top bottom",
-			end: "top top",
-			scrub: true,
-		},
-	}).to(treeLayer, {
-		top: "100%",
-		yPercent: -100,
-		ease: "none",
-	});
+	gsap
+		.timeline({
+			scrollTrigger: {
+				trigger: "#level-2",
+				scroller: scrollContainer,
+				start: "top bottom",
+				end: "top top",
+				scrub: true,
+			},
+		})
+		.to(treeLayer, {
+			top: "100%",
+			yPercent: -100,
+			ease: "none",
+		});
 
 	// Transition: tree rises upward (rocket launch)
-	gsap.timeline({
-		scrollTrigger: {
-			trigger: "#transition-2-3",
-			scroller: scrollContainer,
-			start: "top top",
-			end: "70% top",
-			scrub: true,
-		},
-	}).to(treeLayer, {
-		y: "-150vh",
-		ease: "none",
-	});
+	gsap
+		.timeline({
+			scrollTrigger: {
+				trigger: "#transition-2-3",
+				scroller: scrollContainer,
+				start: "top top",
+				end: "70% top",
+				scrub: true,
+			},
+		})
+		.to(treeLayer, {
+			y: "-150vh",
+			ease: "none",
+		});
 
 	// Hide tree after it's risen off-screen
 	ScrollTrigger.create({
@@ -253,30 +263,34 @@ export function registerSharedLayers(scrollContainer: HTMLElement): void {
 	// Thrust: appears at start of transition
 	const thrustWrap = document.getElementById("shared-thrust");
 	if (thrustWrap) {
-		gsap.timeline({
-			scrollTrigger: {
-				trigger: "#transition-2-3",
-				scroller: scrollContainer,
-				start: "top top",
-				end: "5% top",
-				scrub: true,
-			},
-		}).to(thrustWrap, { opacity: 1, ease: "none" });
+		gsap
+			.timeline({
+				scrollTrigger: {
+					trigger: "#transition-2-3",
+					scroller: scrollContainer,
+					start: "top top",
+					end: "5% top",
+					scrub: true,
+				},
+			})
+			.to(thrustWrap, { opacity: 1, ease: "none" });
 	}
 
 	// ====== STARS ======
 
 	gsap.set(starsLayer, { opacity: 0 });
 
-	gsap.timeline({
-		scrollTrigger: {
-			trigger: "#transition-2-3",
-			scroller: scrollContainer,
-			start: "30% top",
-			end: "80% top",
-			scrub: true,
-		},
-	}).to(starsLayer, { opacity: 1, ease: "none" });
+	gsap
+		.timeline({
+			scrollTrigger: {
+				trigger: "#transition-2-3",
+				scroller: scrollContainer,
+				start: "30% top",
+				end: "80% top",
+				scrub: true,
+			},
+		})
+		.to(starsLayer, { opacity: 1, ease: "none" });
 
 	// Star drift (ambient animation)
 	if (!prefersReducedMotion) {
@@ -320,15 +334,17 @@ export function registerSharedLayers(scrollContainer: HTMLElement): void {
 	gsap.set(alexLayer, { autoAlpha: 0 });
 
 	// Fade in as L2 comes into view
-	gsap.timeline({
-		scrollTrigger: {
-			trigger: "#level-2",
-			scroller: scrollContainer,
-			start: "top bottom",
-			end: "top 60%",
-			scrub: true,
-		},
-	}).to(alexLayer, { autoAlpha: 1, ease: "none" });
+	gsap
+		.timeline({
+			scrollTrigger: {
+				trigger: "#level-2",
+				scroller: scrollContainer,
+				start: "top bottom",
+				end: "top 60%",
+				scrub: true,
+			},
+		})
+		.to(alexLayer, { autoAlpha: 1, ease: "none" });
 
 	// Trigger typing and arrow appear once when L2 enters
 	ScrollTrigger.create({
@@ -403,7 +419,8 @@ export function registerSharedLayers(scrollContainer: HTMLElement): void {
 			scroller: scrollContainer,
 			start: "top+=5% top",
 			onEnter: () => {
-				gsap.timeline()
+				gsap
+					.timeline()
 					.to(document.body, { x: 3, duration: 0.05 })
 					.to(document.body, { x: -3, duration: 0.05 })
 					.to(document.body, { x: 3, duration: 0.05 })

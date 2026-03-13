@@ -46,7 +46,8 @@ export function create(): HTMLElement {
 	overlay.appendChild(modal);
 
 	// --- Event handlers ---
-	const cat = () => document.getElementById("l3-cat") as HTMLImageElement | null;
+	const cat = () =>
+		document.getElementById("l3-cat") as HTMLImageElement | null;
 
 	btnImg.addEventListener("mouseenter", () => {
 		btnImg.src = "/button-hovered.png";
@@ -140,7 +141,10 @@ function closeCaptcha(): void {
 	}
 }
 
-function handleForbiddenPress(btnImg: HTMLImageElement, loadingText: HTMLElement): void {
+function handleForbiddenPress(
+	btnImg: HTMLImageElement,
+	loadingText: HTMLElement,
+): void {
 	// Show pressed briefly, then swap to loading text
 	btnImg.src = "/button-pressed.png";
 	setTimeout(() => {
@@ -161,12 +165,12 @@ function handleForbiddenPress(btnImg: HTMLImageElement, loadingText: HTMLElement
 	}, 300);
 }
 
-
-
 function runCountdownAndLaunch(): void {
 	lockScroll();
 
-	const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+	const prefersReducedMotion = window.matchMedia(
+		"(prefers-reduced-motion: reduce)",
+	).matches;
 	const section = document.getElementById("level-3");
 	if (!section) return;
 
@@ -202,13 +206,19 @@ function runCountdownAndLaunch(): void {
 			{ opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" },
 			i * 0.9,
 		);
-		tl.to(el, { opacity: 0, scale: 1.5, duration: 0.4, ease: "power2.in" }, i * 0.9 + 0.5);
+		tl.to(
+			el,
+			{ opacity: 0, scale: 1.5, duration: 0.4, ease: "power2.in" },
+			i * 0.9 + 0.5,
+		);
 		tl.call(() => el.remove(), [], i * 0.9 + 0.9);
 	});
 }
 
 function launchRocket(): void {
-	const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+	const prefersReducedMotion = window.matchMedia(
+		"(prefers-reduced-motion: reduce)",
+	).matches;
 	const section = document.getElementById("level-3");
 	const rocket = section?.querySelector<HTMLElement>(".l3-rocket");
 	const planetWrap = section?.querySelector<HTMLElement>(".l3-planet-wrap");
@@ -269,11 +279,7 @@ function launchRocket(): void {
 	);
 
 	// Grow thrust more during flight
-	launchTl.to(
-		thrust,
-		{ scaleY: 1.8, duration: 2.5, ease: "power1.in" },
-		0.6,
-	);
+	launchTl.to(thrust, { scaleY: 1.8, duration: 2.5, ease: "power1.in" }, 0.6);
 }
 
 function postLaunch(rocket: HTMLElement, thrust: HTMLElement): void {
@@ -294,7 +300,9 @@ function postLaunch(rocket: HTMLElement, thrust: HTMLElement): void {
 	const input = document.querySelector<HTMLInputElement>("#level-3 .l3-input");
 	if (input) input.disabled = true;
 
-	const btn = document.querySelector<HTMLButtonElement>("#level-3 .l3-subscribe");
+	const btn = document.querySelector<HTMLButtonElement>(
+		"#level-3 .l3-subscribe",
+	);
 	if (btn) btn.disabled = true;
 
 	// Reset captcha modal for next open (won't happen since launched=true)

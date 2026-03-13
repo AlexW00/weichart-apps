@@ -19,9 +19,7 @@ let programmaticScroll = false;
 export function initScroll(scrollContainer: HTMLElement): void {
 	container = scrollContainer;
 
-	levelEls = LEVEL_IDS.map(
-		(id) => document.getElementById(id)!,
-	);
+	levelEls = LEVEL_IDS.map((id) => document.getElementById(id)!);
 	transitionEl = document.getElementById(TRANSITION_ID);
 
 	ScrollTrigger.defaults({ scroller: container });

@@ -7,8 +7,16 @@ interface AppInfo {
 }
 
 const APPS: AppInfo[] = [
-	{ icon: "zettel-icon.png", name: "Zettel", description: "Minimalist Quick Notes" },
-	{ icon: "zeitgeist-icon.png", name: "Zeitgeist", description: "Screen Time, Reimagined" },
+	{
+		icon: "zettel-icon.png",
+		name: "Zettel",
+		description: "Minimalist Quick Notes",
+	},
+	{
+		icon: "zeitgeist-icon.png",
+		name: "Zeitgeist",
+		description: "Screen Time, Reimagined",
+	},
 	{ icon: "next-icon.png", name: "?", description: "Coming Soon" },
 ];
 

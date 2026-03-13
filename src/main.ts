@@ -7,7 +7,12 @@ import * as transition23 from "./levels/transition23";
 import * as level3 from "./levels/level3";
 import * as captcha from "./captcha";
 import { createSharedLayers, registerSharedLayers } from "./shared-layers";
-import { initScroll, scrollToLevel, getActiveLevel, onLevelChange } from "./scroll";
+import {
+	initScroll,
+	scrollToLevel,
+	getActiveLevel,
+	onLevelChange,
+} from "./scroll";
 import { initRouter } from "./router";
 
 const app = document.querySelector<HTMLDivElement>("#app")!;
