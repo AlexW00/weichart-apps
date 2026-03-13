@@ -264,7 +264,7 @@ This path should only be allowed once per page session unless the page is reload
 | `button.png`         | 558×245 px | Default state of the forbidden red button                   |
 | `button-hovered.png` | 549×165 px | Hover state of the forbidden red button                     |
 | `button-pressed.png` | 549×93 px  | Pressed state of the forbidden red button                   |
-| `cat-wake.svg`       | 78×27 px   | Cat awake from forbidden-button press through end of launch  |
+| `cat-wake.svg`       | 78×27 px   | Cat awake from forbidden-button press through end of launch |
 | `cat-sleeping.svg`   | 85×27 px   | Cat sleeping in default and finished states                 |
 | `rocket.svg`         | 64×196 px  | Rocket launching upward during the sequence                 |
 | `rocket-thrust.svg`  | 472×900 px | Narrow thrust flame aligned under the rocket during liftoff |
