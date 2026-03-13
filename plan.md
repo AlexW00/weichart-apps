@@ -25,6 +25,7 @@ src/
 ```
 
 Each level module exports:
+
 - `create(): HTMLElement` — builds and returns its DOM subtree
 - `register(scrollEngine): void` — hooks its animations into the scroll timeline
 
@@ -72,8 +73,8 @@ Mobile layout adjustments, touch interaction fallbacks, reduced-motion media que
 
 ## Library Justification
 
-| Library | Why |
-|---|---|
+| Library                           | Why                                                                                                                                                                                                                                              |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | **gsap** (+ ScrollTrigger plugin) | Scroll-linked pinning, scrubbing, and cross-device normalization is the single hardest part of this project. GSAP is the industry standard and handles mobile momentum, resize, nested timelines — things that take weeks to hand-roll reliably. |
 
 No other libraries. No React, no CSS framework, no router library.
