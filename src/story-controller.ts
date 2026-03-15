@@ -73,10 +73,9 @@ function updateActiveScene(): void {
 	for (let i = entries.length - 1; i >= 0; i--) {
 		const entry = entries[i];
 		// Account for pin-spacer wrappers
-		const ref =
-			entry.spacer.parentElement?.classList.contains("pin-spacer")
-				? entry.spacer.parentElement
-				: entry.spacer;
+		const ref = entry.spacer.parentElement?.classList.contains("pin-spacer")
+			? entry.spacer.parentElement
+			: entry.spacer;
 		if (mid >= ref.offsetTop) {
 			setActiveScene(i);
 			return;
@@ -111,10 +110,9 @@ export function onSceneChange(callback: (index: number) => void): void {
 export function jumpToIndex(index: number, animate = true): void {
 	if (index < 0 || index >= entries.length) return;
 	const entry = entries[index];
-	const ref =
-		entry.spacer.parentElement?.classList.contains("pin-spacer")
-			? entry.spacer.parentElement
-			: entry.spacer;
+	const ref = entry.spacer.parentElement?.classList.contains("pin-spacer")
+		? entry.spacer.parentElement
+		: entry.spacer;
 	const targetTop = ref.offsetTop;
 
 	if (animate) {

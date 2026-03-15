@@ -297,7 +297,9 @@ function postLaunch(rocket: HTMLElement, thrust: HTMLElement): void {
 	const form = document.querySelector<HTMLElement>("#space-layer .l3-form");
 	if (form) form.classList.add("disabled");
 
-	const input = document.querySelector<HTMLInputElement>("#space-layer .l3-input");
+	const input = document.querySelector<HTMLInputElement>(
+		"#space-layer .l3-input",
+	);
 	if (input) input.disabled = true;
 
 	const btn = document.querySelector<HTMLButtonElement>(

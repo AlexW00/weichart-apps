@@ -17,6 +17,9 @@ export const alexScene: Scene = {
 	register(container, spacer) {
 		const treeLayer = document.getElementById("shared-tree")!;
 		const alexLayer = document.getElementById("alex-layer")!;
+		const bubbleText = alexLayer.querySelector<HTMLElement>(".l2-bubble-text");
+		const quote = QUOTES[Math.floor(Math.random() * QUOTES.length)];
+		const quoteChars = Array.from(quote);
 
 		// Tree: keep 130vw, slide to trunk view (bottom-aligned)
 		gsap
@@ -35,51 +38,47 @@ export const alexScene: Scene = {
 				ease: "none",
 			});
 
-		// Alex layer: initially hidden
 		gsap.set(alexLayer, { autoAlpha: 0 });
 
-		// Fade in as this scene enters
-		gsap
-			.timeline({
-				scrollTrigger: {
-					trigger: spacer,
-					scroller: container,
-					start: "top bottom",
-					end: "top 60%",
-					scrub: true,
-				},
-			})
-			.to(alexLayer, { autoAlpha: 1, ease: "none" });
+		if (bubbleText) {
+			bubbleText.textContent = "";
+		}
 
-		// Trigger typing and arrow appear once
 		ScrollTrigger.create({
 			trigger: spacer,
 			scroller: container,
-			start: "top 60%",
-			once: true,
+			start: "top bottom",
+			end: "bottom top",
 			onEnter: () => {
-				const bt = alexLayer.querySelector<HTMLElement>(".l2-bubble-text");
-				if (bt) {
-					const quote = QUOTES[Math.floor(Math.random() * QUOTES.length)];
-					typeQuote(bt, quote);
-				}
-				const aw =
-					alexLayer.querySelector<HTMLElement>(".l2-arrow-wrap");
-				if (aw)
-					setTimeout(() => aw.classList.add("l2-arrow-wrap--visible"), 300);
+				gsap.set(alexLayer, { autoAlpha: 1 });
+			},
+			onEnterBack: () => {
+				gsap.set(alexLayer, { autoAlpha: 1 });
+			},
+			onLeaveBack: () => {
+				gsap.set(alexLayer, { autoAlpha: 0 });
+				if (bubbleText) bubbleText.textContent = "";
 			},
 		});
+
+		if (bubbleText) {
+			ScrollTrigger.create({
+				trigger: spacer,
+				scroller: container,
+				start: "top top",
+				end: "bottom 28%",
+				scrub: true,
+				onUpdate: ({ progress }) => {
+					const visibleChars = Math.round(progress * quoteChars.length);
+					bubbleText.textContent = quoteChars.slice(0, visibleChars).join("");
+				},
+				onLeave: () => {
+					bubbleText.textContent = quote;
+				},
+				onLeaveBack: () => {
+					bubbleText.textContent = "";
+				},
+			});
+		}
 	},
 };
-
-function typeQuote(el: HTMLElement, text: string): void {
-	const chars = Array.from(text);
-	let i = 0;
-	function next(): void {
-		if (i >= chars.length) return;
-		i++;
-		el.textContent = chars.slice(0, i).join("");
-		setTimeout(next, 45);
-	}
-	setTimeout(next, 800);
-}

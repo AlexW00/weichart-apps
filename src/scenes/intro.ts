@@ -67,7 +67,7 @@ export const introScene: Scene = {
 		const treeLayer = document.getElementById("shared-tree")!;
 		gsap.set(treeLayer, {
 			top: "100%",
-			width: "48vw",
+			"--tree-width": "42vw",
 			xPercent: -50,
 			yPercent: -60,
 		});

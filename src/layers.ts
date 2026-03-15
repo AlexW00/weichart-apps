@@ -68,8 +68,6 @@ export function createLayers(): void {
 	thrustWrap.appendChild(thrustImg);
 	treeLayer.appendChild(thrustWrap);
 
-	document.body.insertBefore(treeLayer, app);
-
 	// --- Alex layer (visible during alex & transition scenes) ---
 	const alexLayer = document.createElement("div");
 	alexLayer.id = "alex-layer";
@@ -137,5 +135,7 @@ export function createLayers(): void {
 	bubbleWrap.append(bubbleImg, bubbleText);
 
 	alexLayer.append(alexFigure, arrowWrap, bubbleWrap);
-	document.body.insertBefore(alexLayer, app);
+	treeLayer.appendChild(alexLayer);
+
+	document.body.insertBefore(treeLayer, app);
 }

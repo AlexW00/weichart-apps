@@ -157,8 +157,7 @@ export const transitionScene: Scene = {
 		});
 
 		if (arrowEl) alexFlyTl.to(arrowEl, { autoAlpha: 0, duration: 0.05 }, 0);
-		if (bubbleEl)
-			alexFlyTl.to(bubbleEl, { autoAlpha: 0, duration: 0.05 }, 0);
+		if (bubbleEl) alexFlyTl.to(bubbleEl, { autoAlpha: 0, duration: 0.05 }, 0);
 
 		if (alexFigure) {
 			alexFlyTl.to(

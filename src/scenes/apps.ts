@@ -1,6 +1,7 @@
 /** Scene: App Tree — zoomed canopy with interactive app icons */
 
 import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import type { Scene } from "../story-controller";
 
 interface AppInfo {
@@ -25,13 +26,17 @@ const APPS: AppInfo[] = [
 
 let appsLayer: HTMLElement;
 
+interface AppsInteractionController {
+	setScrollFocus(index: number | null): void;
+}
+
 export const appsScene: Scene = {
 	id: "apps",
 	route: "/apps",
-	weight: 2,
+	weight: 3,
 
 	setup() {
-		const app = document.getElementById("app")!;
+		const treeLayer = document.getElementById("shared-tree")!;
 
 		appsLayer = document.createElement("div");
 		appsLayer.id = "apps-layer";
@@ -65,12 +70,13 @@ export const appsScene: Scene = {
 		}
 
 		appsLayer.append(label, iconsRow);
-		document.body.insertBefore(appsLayer, app);
+		treeLayer.appendChild(appsLayer);
 	},
 
 	register(container, spacer) {
 		const bgLayer = document.getElementById("bg-layer")!;
 		const treeLayer = document.getElementById("shared-tree")!;
+		const interactions = wireIconInteractions();
 
 		// Show apps layer when entering this scene, hide when leaving
 		gsap.set(appsLayer, { autoAlpha: 0 });
@@ -119,7 +125,7 @@ export const appsScene: Scene = {
 				{ backgroundColor: "#fefef4", ease: "none" },
 			);
 
-		// Tree: zoom into canopy (48vw → 130vw, bottom → top)
+		// Tree: zoom into canopy (42vw → 118vw, bottom → top)
 		gsap
 			.timeline({
 				scrollTrigger: {
@@ -132,74 +138,115 @@ export const appsScene: Scene = {
 			})
 			.to(treeLayer, {
 				top: "-15%",
-				width: "130vw",
+				"--tree-width": "118vw",
 				yPercent: 0,
 				ease: "none",
 			});
 
-		// Hide apps layer when leaving (entering alex scene)
-		gsap
-			.timeline({
-				scrollTrigger: {
-					trigger: spacer,
-					scroller: container,
-					start: "bottom 60%",
-					end: "bottom top",
-					scrub: true,
-				},
-			})
-			.to(appsLayer, { autoAlpha: 0, ease: "none" });
+		ScrollTrigger.create({
+			trigger: spacer,
+			scroller: container,
+			start: "top top",
+			end: "bottom top",
+			onUpdate: ({ progress }) => {
+				const normalized = gsap.utils.normalize(0.15, 0.75, progress);
+				if (normalized <= 0) {
+					interactions.setScrollFocus(null);
+					return;
+				}
 
-		// Wire icon interactions
-		wireIconInteractions();
+				const iconIndex = Math.min(
+					Math.floor(normalized * APPS.length),
+					APPS.length - 1,
+				);
+				interactions.setScrollFocus(iconIndex);
+			},
+			onLeaveBack: () => {
+				interactions.setScrollFocus(null);
+			},
+		});
 	},
 };
 
-function wireIconInteractions(): void {
+function wireIconInteractions(): AppsInteractionController {
 	const label = appsLayer.querySelector<HTMLElement>(".l1-label");
 	const labelName = appsLayer.querySelector<HTMLElement>(".l1-label-name");
 	const labelDesc = appsLayer.querySelector<HTMLElement>(".l1-label-desc");
-	const icons = appsLayer.querySelectorAll<HTMLElement>(".l1-app-icon");
+	const icons = Array.from(
+		appsLayer.querySelectorAll<HTMLElement>(".l1-app-icon"),
+	);
 
-	if (!label || !labelName || !labelDesc) return;
+	if (!label || !labelName || !labelDesc || icons.length === 0) {
+		return {
+			setScrollFocus() {},
+		};
+	}
+
+	const labelEl = label;
+	const labelNameEl = labelName;
+	const labelDescEl = labelDesc;
 
 	let activeIcon: HTMLElement | null = null;
+	let manualIcon: HTMLElement | null = null;
+	let scrollFocusIndex: number | null = null;
 
-	function showLabel(icon: HTMLElement): void {
-		if (!label || !labelName || !labelDesc) return;
-		labelName.textContent = icon.dataset.appName ?? "";
-		labelDesc.textContent = icon.dataset.appDesc ?? "";
-		label.classList.add("l1-label--visible");
+	function setActiveIcon(icon: HTMLElement | null): void {
+		if (activeIcon === icon) return;
+
+		activeIcon?.classList.remove("l1-app-icon--active");
+
+		if (!icon) {
+			labelEl.classList.remove("l1-label--visible");
+			activeIcon = null;
+			return;
+		}
+
+		labelNameEl.textContent = icon.dataset.appName ?? "";
+		labelDescEl.textContent = icon.dataset.appDesc ?? "";
+		labelEl.classList.add("l1-label--visible");
+		icon.classList.add("l1-app-icon--active");
 		activeIcon = icon;
 	}
 
-	function hideLabel(): void {
-		if (!label) return;
-		label.classList.remove("l1-label--visible");
-		activeIcon = null;
+	function syncActiveIcon(): void {
+		const nextIcon =
+			manualIcon ?? (scrollFocusIndex === null ? null : icons[scrollFocusIndex]);
+		setActiveIcon(nextIcon);
 	}
 
 	const supportsHover = window.matchMedia("(hover: hover)").matches;
 
 	icons.forEach((icon) => {
 		if (supportsHover) {
-			icon.addEventListener("pointerenter", () => showLabel(icon));
-			icon.addEventListener("pointerleave", () => hideLabel());
+			icon.addEventListener("pointerenter", () => {
+				manualIcon = icon;
+				syncActiveIcon();
+			});
+			icon.addEventListener("pointerleave", () => {
+				manualIcon = null;
+				syncActiveIcon();
+			});
 		} else {
 			icon.addEventListener("click", (e) => {
 				e.stopPropagation();
-				if (activeIcon === icon) {
-					hideLabel();
-				} else {
-					showLabel(icon);
-				}
+				manualIcon = manualIcon === icon ? null : icon;
+				syncActiveIcon();
 			});
 		}
 	});
 
 	if (!supportsHover) {
 		document.addEventListener("click", () => {
-			if (activeIcon) hideLabel();
+			if (!manualIcon) return;
+			manualIcon = null;
+			syncActiveIcon();
 		});
 	}
+
+	return {
+		setScrollFocus(index) {
+			scrollFocusIndex = index;
+			syncActiveIcon();
+		},
+	};
 }
