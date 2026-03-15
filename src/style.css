@@ -175,27 +175,73 @@ body {
 }
 
 /* ===========================
-   Level Sections
+   Scene Spacers
    =========================== */
 
-.level {
+.scene-spacer {
 	position: relative;
 	width: 100%;
-	min-height: 100vh;
-	overflow: hidden;
+	pointer-events: none;
+}
+
+/* ===========================
+   Fixed Scene Layers
+   =========================== */
+
+#intro-layer {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 5;
+	pointer-events: none;
+}
+
+#apps-layer {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 5;
+	pointer-events: none;
+	visibility: hidden;
+	opacity: 0;
+}
+
+#apps-layer .l1-app-icon {
+	pointer-events: auto;
+}
+
+#space-layer {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 5;
+	pointer-events: none;
+	visibility: hidden;
+	opacity: 0;
+}
+
+#space-layer .l3-subscribe,
+#space-layer .l3-input {
+	pointer-events: auto;
 }
 
 /* ===========================
    Level 0: Intro / Sky
    =========================== */
 
-#level-0 {
+#intro-layer {
 	background: transparent;
 }
 
 /* --- Cloud Band --- */
 
-#level-0 .cloud-band {
+#intro-layer .cloud-band {
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -207,24 +253,24 @@ body {
 	z-index: 3;
 }
 
-#level-0 .cloud-row {
+#intro-layer .cloud-row {
 	display: flex;
 	position: absolute;
 	left: 0;
 	top: 0;
 }
 
-#level-0 .cloud-row-1 {
+#intro-layer .cloud-row-1 {
 	animation: cloud-scroll 35s linear infinite;
 }
 
-#level-0 .cloud-row-2 {
+#intro-layer .cloud-row-2 {
 	top: 50px;
 	left: 70px;
 	animation: cloud-scroll 38s linear infinite;
 }
 
-#level-0 .cloud-img {
+#intro-layer .cloud-img {
 	height: 100px;
 	width: auto;
 	display: block;
@@ -242,7 +288,7 @@ body {
 
 /* --- Branding --- */
 
-#level-0 .branding {
+#intro-layer .branding {
 	position: absolute;
 	top: 28%;
 	left: 50%;
@@ -253,7 +299,7 @@ body {
 	z-index: 5;
 }
 
-#level-0 .wordmark {
+#intro-layer .wordmark {
 	font-family: var(--font-display);
 	font-weight: 400;
 	font-size: 120px;
@@ -261,7 +307,7 @@ body {
 	color: black;
 }
 
-#level-0 .subtitle {
+#intro-layer .subtitle {
 	font-family: var(--font-display);
 	font-style: italic;
 	font-weight: 400;
@@ -272,12 +318,12 @@ body {
 	white-space: nowrap;
 }
 
-#level-0 .typed-word {
+#intro-layer .typed-word {
 	color: var(--color-accent);
 	text-decoration: underline;
 }
 
-#level-0 .cursor {
+#intro-layer .cursor {
 	color: var(--color-accent);
 	animation: cursor-blink 1.06s step-end infinite;
 }
@@ -298,42 +344,35 @@ body {
 /* --- Mobile --- */
 
 @media (max-width: 768px) {
-	#level-0 .wordmark {
+	#intro-layer .wordmark {
 		font-size: 70px;
 	}
 
-	#level-0 .subtitle {
+	#intro-layer .subtitle {
 		font-size: 20px;
 	}
 
-	#level-0 .cloud-band {
+	#intro-layer .cloud-band {
 		height: 90px;
 	}
 
-	#level-0 .cloud-img {
+	#intro-layer .cloud-img {
 		height: 70px;
 	}
 
-	#level-0 .cloud-row-2 {
+	#intro-layer .cloud-row-2 {
 		top: 35px;
 		left: 46px;
 	}
 }
 
 /* ===========================
-   Level 1: App Tree (zoomed-in canopy)
+   App Icons (apps-layer)
    =========================== */
-
-#level-1 {
-	background: transparent;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
 
 /* --- Label area --- */
 
-#level-1 .l1-label {
+#apps-layer .l1-label {
 	position: absolute;
 	top: 22%;
 	left: 50%;
@@ -346,11 +385,11 @@ body {
 	white-space: nowrap;
 }
 
-#level-1 .l1-label--visible {
+#apps-layer .l1-label--visible {
 	opacity: 1;
 }
 
-#level-1 .l1-label-name {
+#apps-layer .l1-label-name {
 	font-family: var(--font-display);
 	font-weight: 400;
 	font-size: 52px;
@@ -358,7 +397,7 @@ body {
 	color: black;
 }
 
-#level-1 .l1-label-desc {
+#apps-layer .l1-label-desc {
 	font-family: var(--font-display);
 	font-style: italic;
 	font-weight: 400;
@@ -370,7 +409,7 @@ body {
 
 /* --- App icons row --- */
 
-#level-1 .l1-icons-row {
+#apps-layer .l1-icons-row {
 	position: absolute;
 	top: 44%;
 	left: 50%;
@@ -380,7 +419,7 @@ body {
 	z-index: 3;
 }
 
-#level-1 .l1-app-icon {
+#apps-layer .l1-app-icon {
 	width: 130px;
 	height: 130px;
 	border-radius: 16px;
@@ -392,7 +431,7 @@ body {
 }
 
 @media (hover: hover) {
-	#level-1 .l1-app-icon:hover {
+	#apps-layer .l1-app-icon:hover {
 		transform: scale(1.05) rotate(3deg);
 		box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
 	}
@@ -401,31 +440,27 @@ body {
 /* --- Mobile --- */
 
 @media (max-width: 768px) {
-	#level-1 .l1-icons-row {
+	#apps-layer .l1-icons-row {
 		gap: 24px;
 	}
 
-	#level-1 .l1-app-icon {
+	#apps-layer .l1-app-icon {
 		width: 95px;
 		height: 95px;
 	}
 
-	#level-1 .l1-label-name {
+	#apps-layer .l1-label-name {
 		font-size: 36px;
 	}
 
-	#level-1 .l1-label-desc {
+	#apps-layer .l1-label-desc {
 		font-size: 16px;
 	}
 }
 
 /* ===========================
-   Level 2: Alex Watering
+   Alex Watering (alex-layer styles in shared layers above)
    =========================== */
-
-#level-2 {
-	background: transparent;
-}
 
 /* --- Alex composite (shared layer) --- */
 
@@ -657,29 +692,12 @@ body {
 }
 
 /* ===========================
-   Transition 2→3: Rocket Launch
+   Space / Newsletter (space-layer)
    =========================== */
-
-#transition-2-3 {
-	min-height: 300vh;
-	background-color: transparent;
-	overflow: hidden;
-}
-
-/* ===========================
-   Level 3: Space / Newsletter
-   =========================== */
-
-#level-3 {
-	background: transparent;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
 
 /* --- Planet wrap --- */
 
-#level-3 .l3-planet-wrap {
+#space-layer .l3-planet-wrap {
 	position: absolute;
 	bottom: 0;
 	left: 0;
@@ -687,7 +705,7 @@ body {
 	z-index: 2;
 }
 
-#level-3 .l3-planet-img {
+#space-layer .l3-planet-img {
 	width: 100%;
 	height: auto;
 	display: block;
@@ -696,7 +714,7 @@ body {
 
 /* --- Rocket --- */
 
-#level-3 .l3-rocket {
+#space-layer .l3-rocket {
 	position: absolute;
 	left: 50%;
 	bottom: 38%;
@@ -708,7 +726,7 @@ body {
 
 /* --- Gantry --- */
 
-#level-3 .l3-gantry {
+#space-layer .l3-gantry {
 	position: absolute;
 	left: calc(50% - 80px);
 	bottom: 38%;
@@ -720,7 +738,7 @@ body {
 
 /* --- Cat --- */
 
-#level-3 .l3-cat {
+#space-layer .l3-cat {
 	position: absolute;
 	left: calc(50% + 70px);
 	bottom: 37%;
@@ -731,7 +749,7 @@ body {
 
 /* --- Email form --- */
 
-#level-3 .l3-form {
+#space-layer .l3-form {
 	position: absolute;
 	bottom: 12%;
 	left: 50%;
@@ -742,7 +760,7 @@ body {
 	align-items: center;
 }
 
-#level-3 .l3-input {
+#space-layer .l3-input {
 	width: 230px;
 	height: 42px;
 	padding: 0 12px;
@@ -756,15 +774,15 @@ body {
 	transition: border-color 0.2s ease;
 }
 
-#level-3 .l3-input::placeholder {
+#space-layer .l3-input::placeholder {
 	color: rgba(255, 255, 255, 0.45);
 }
 
-#level-3 .l3-input:focus {
+#space-layer .l3-input:focus {
 	border-color: white;
 }
 
-#level-3 .l3-subscribe {
+#space-layer .l3-subscribe {
 	width: 110px;
 	height: 42px;
 	border: 1px solid rgba(255, 255, 255, 0.7);
@@ -777,7 +795,7 @@ body {
 	transition: background 0.2s ease, border-color 0.2s ease;
 }
 
-#level-3 .l3-subscribe:hover {
+#space-layer .l3-subscribe:hover {
 	background: rgba(255, 255, 255, 0.12);
 	border-color: white;
 }
@@ -785,28 +803,28 @@ body {
 /* --- Mobile --- */
 
 @media (max-width: 768px) {
-	#level-3 .l3-form {
+	#space-layer .l3-form {
 		flex-direction: column;
 	}
 
-	#level-3 .l3-input {
+	#space-layer .l3-input {
 		width: 220px;
 	}
 
-	#level-3 .l3-subscribe {
+	#space-layer .l3-subscribe {
 		width: 220px;
 		min-height: 44px;
 	}
 
-	#level-3 .l3-rocket {
+	#space-layer .l3-rocket {
 		height: 20vh;
 	}
 
-	#level-3 .l3-gantry {
+	#space-layer .l3-gantry {
 		height: 16vh;
 	}
 
-	#level-3 .l3-cat {
+	#space-layer .l3-cat {
 		width: 65px;
 		left: calc(50% + 35px);
 	}
@@ -935,7 +953,7 @@ body {
    Disabled Form (Post-Launch)
    =========================== */
 
-#level-3 .l3-form.disabled {
+#space-layer .l3-form.disabled {
 	opacity: 0.4;
 	pointer-events: none;
 }
@@ -1026,25 +1044,25 @@ body {
    =========================== */
 
 @media (prefers-reduced-motion: reduce) {
-	#level-0 .cloud-row-1,
-	#level-0 .cloud-row-2 {
+	#intro-layer .cloud-row-1,
+	#intro-layer .cloud-row-2 {
 		animation: none;
 	}
 
-	#level-2 .l2-can {
+	#alex-layer .l2-can {
 		animation: none;
 	}
 
-	#level-2 .l2-drop {
+	#alex-layer .l2-drop {
 		animation: none;
 	}
 
-	#level-2 .l2-arrow-wrap,
-	#level-2 .l2-bubble-wrap {
+	#alex-layer .l2-arrow-wrap,
+	#alex-layer .l2-bubble-wrap {
 		animation: none;
 	}
 
-	#level-0 .cursor {
+	#intro-layer .cursor {
 		animation: none;
 		border-right-color: transparent;
 	}

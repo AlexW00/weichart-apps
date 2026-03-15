@@ -1,7 +1,7 @@
 /** Fake captcha modal + rocket launch sequence */
 
 import { gsap } from "gsap";
-import { lockScroll, unlockScroll } from "./scroll";
+import { lockScroll, unlockScroll } from "./story-controller";
 
 let overlay: HTMLElement;
 let launched = false;
@@ -171,7 +171,7 @@ function runCountdownAndLaunch(): void {
 	const prefersReducedMotion = window.matchMedia(
 		"(prefers-reduced-motion: reduce)",
 	).matches;
-	const section = document.getElementById("level-3");
+	const section = document.getElementById("space-layer");
 	if (!section) return;
 
 	const positions = prefersReducedMotion
@@ -219,7 +219,7 @@ function launchRocket(): void {
 	const prefersReducedMotion = window.matchMedia(
 		"(prefers-reduced-motion: reduce)",
 	).matches;
-	const section = document.getElementById("level-3");
+	const section = document.getElementById("space-layer");
 	const rocket = section?.querySelector<HTMLElement>(".l3-rocket");
 	const planetWrap = section?.querySelector<HTMLElement>(".l3-planet-wrap");
 	if (!section || !rocket || !planetWrap) return;
@@ -294,14 +294,14 @@ function postLaunch(rocket: HTMLElement, thrust: HTMLElement): void {
 	if (cat) cat.src = "/cat-sleeping.svg";
 
 	// Disable form
-	const form = document.querySelector<HTMLElement>("#level-3 .l3-form");
+	const form = document.querySelector<HTMLElement>("#space-layer .l3-form");
 	if (form) form.classList.add("disabled");
 
-	const input = document.querySelector<HTMLInputElement>("#level-3 .l3-input");
+	const input = document.querySelector<HTMLInputElement>("#space-layer .l3-input");
 	if (input) input.disabled = true;
 
 	const btn = document.querySelector<HTMLButtonElement>(
-		"#level-3 .l3-subscribe",
+		"#space-layer .l3-subscribe",
 	);
 	if (btn) btn.disabled = true;
 

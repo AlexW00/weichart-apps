@@ -1,45 +1,42 @@
 import "./style.css";
 
-import * as level0 from "./levels/level0";
-import * as level1 from "./levels/level1";
-import * as level2 from "./levels/level2";
-import * as transition23 from "./levels/transition23";
-import * as level3 from "./levels/level3";
-import * as captcha from "./captcha";
-import { createSharedLayers, registerSharedLayers } from "./shared-layers";
+import { createLayers } from "./layers";
 import {
-	initScroll,
-	scrollToLevel,
-	getActiveLevel,
-	onLevelChange,
-} from "./scroll";
+	addScene,
+	init,
+	jumpToIndex,
+	getActiveIndex,
+	getSceneCount,
+	onSceneChange,
+} from "./story-controller";
+import { introScene } from "./scenes/intro";
+import { appsScene } from "./scenes/apps";
+import { alexScene } from "./scenes/alex";
+import { transitionScene } from "./scenes/transition";
+import { spaceScene } from "./scenes/space";
+import * as captcha from "./captcha";
 import { initRouter } from "./router";
 
 const app = document.querySelector<HTMLDivElement>("#app")!;
 
-// Create shared visual layers (bg, tree, stars) — BEFORE sections
-createSharedLayers();
+// Create shared fixed layers (bg, tree, stars, alex) — BEFORE #app
+createLayers();
 
-// Build DOM: append each level section in narrative order
-const levels = [level0, level1, level2, transition23, level3];
-for (const level of levels) {
-	app.appendChild(level.create());
-}
+// Register scenes in narrative order
+addScene(introScene);
+addScene(appsScene);
+addScene(alexScene);
+addScene(transitionScene);
+addScene(spaceScene);
 
-// Captcha overlay is appended to body, not the scroll container
+// Captcha overlay appended to body
 document.body.appendChild(captcha.create());
 
-// Initialize scroll engine and router
-initScroll(app);
+// Initialize controller: creates spacers, setups, registers animations
+init(app);
+
+// Router: URL ↔ scene sync
 initRouter();
-
-// Register shared layer animations
-registerSharedLayers(app);
-
-// Register each level's animations with the scroll container
-for (const level of levels) {
-	level.register(app);
-}
 
 // --- Nav Controls ---
 createNavControls();
@@ -61,22 +58,23 @@ function createNavControls(): void {
 	nav.append(upBtn, downBtn);
 	document.body.appendChild(nav);
 
-	function updateDisabled(level: number): void {
-		upBtn.classList.toggle("disabled", level === 0);
-		downBtn.classList.toggle("disabled", level === 3);
+	const lastIdx = getSceneCount() - 1;
+
+	function updateDisabled(index: number): void {
+		upBtn.classList.toggle("disabled", index === 0);
+		downBtn.classList.toggle("disabled", index === lastIdx);
 	}
 
-	updateDisabled(getActiveLevel());
-	onLevelChange(updateDisabled);
+	updateDisabled(getActiveIndex());
+	onSceneChange(updateDisabled);
 
 	upBtn.addEventListener("click", () => {
-		const cur = getActiveLevel();
-		if (cur > 0) scrollToLevel(cur - 1);
+		const cur = getActiveIndex();
+		if (cur > 0) jumpToIndex(cur - 1);
 	});
 
 	downBtn.addEventListener("click", () => {
-		const cur = getActiveLevel();
-		if (cur < 3) scrollToLevel(cur + 1);
+		const cur = getActiveIndex();
+		if (cur < lastIdx) jumpToIndex(cur + 1);
 	});
 }
-captcha.register(app);
