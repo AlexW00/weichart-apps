@@ -2,11 +2,18 @@
 
 ## Overview
 
-Build the opening screen of the landing page: a bright sky scene that introduces the Weichart brand. This is the very first thing visitors see — it should feel cheerful, hand-crafted, and inviting.
+Build the opening story state of the landing page: a bright sky composition that introduces the Weichart brand. This is the first resting state inside the shared scene and should feel cheerful, hand-crafted, and inviting.
 
-The level fills exactly one viewport height. It contains a scrolling cloud strip across the top edge, the "Weichart" wordmark and "Apps for Humans" tagline in the upper-middle area, and a large watercolor tree filling the bottom half with app icons nestled in its canopy.
+This phase creates the initial positions of the persistent intro elements:
 
-After this phase, `npm run dev` should show a complete, visually correct Level 0 matching `designs/level-0.png`. No scroll interactions yet — those are wired in Phase 7.
+- cloud band
+- wordmark and subtitle
+- the tree
+- the three app icons
+
+Do not build these as a standalone full-screen section that later gets replaced. The tree and icons created here are the same elements that later phases will zoom, reframe, and animate.
+
+After this phase, `npm run dev` should show a visually correct intro state matching `designs/level-0.png`. Scroll choreography is still deferred to Phase 7.
 
 **Prerequisites:** Phase 0 must be complete (GSAP installed, module stubs exist, CSS tokens defined, fonts loaded).
 
@@ -30,7 +37,7 @@ Both rows animate slowly and continuously from right to left (or left to right �
 
 Each cloud is rendered at roughly 1/3 of its original height, so about 130px tall on desktop. The gradient background shows through between the cloud shapes (they have transparent backgrounds). The band is purely decorative and does not respond to clicks.
 
-When the user scrolls down to later levels, this cloud band scrolls out of view along with the rest of Level 0 — it is not pinned or sticky.
+As story progress moves toward later checkpoints, this cloud band should translate out of frame as part of the shared scene. It is not a separate sticky header and it should not be recreated later.
 
 ### Branding text (upper-middle)
 
@@ -61,7 +68,7 @@ Periodically, a typing animation cycles through translations of "Humans":
 
 The cursor continues blinking throughout, including during typing and deletion. The typed word always appears in olive-green (`#808C27`).
 
-Start this animation when `register()` is called. The initial word "Humans" should already be present in the DOM from `create()`.
+Start this animation when `register(scene)` is called. The initial word "Humans" should already be present in the DOM from `setup(scene)`.
 
 ### The tree (bottom-center)
 
@@ -133,12 +140,14 @@ At this level the icons are just static previews — they are not interactive. T
 
 ## Module Structure
 
-Implement in `src/levels/level0.ts` following the architecture from Phase 0:
+Implement in `src/levels/level0.ts` following the shared-scene architecture from Phase 0:
 
-- `create()` — builds and returns the entire Level 0 DOM subtree (section element with all children)
-- `register(scrollContainer)` — starts the typing animation
+- `setup(scene)` — mount the persistent intro elements into the shared scene layers and store refs for the tree, icon row, wordmark, subtitle word span, and cloud band
+- `register(scene)` — start the typing animation and any ambient intro-only loops
 
-Add Level 0 styles to `src/style.css`, appended after the existing rules.
+Important: the tree and icon DOM created here are reused by Phases 2, 3, and 4. Later phases should transform these same nodes instead of rendering alternate versions.
+
+Add Level 0 styles to `src/style.css`, appended after the existing scene-shell rules.
 
 ---
 
@@ -154,7 +163,8 @@ After implementation, visually confirm in the browser:
 6. Tree is centered, canopy visible from mid-viewport up, trunk clipped below viewport — the canopy's green blob, dashed border, and ASCII art decorations are all visible as part of the tree image
 7. Three small icons visible inside the canopy in a row, positioned on top of the tree image
 8. Layer order correct: text readable above clouds, clouds above tree
-9. On mobile (≤768px): everything scales down proportionally, nothing breaks
+9. The tree and icon row are exposed as persistent shared-scene refs for later phases rather than hidden inside an isolated section-only API
+10. On mobile (≤768px): everything scales down proportionally, nothing breaks
 
 Build check: `npx tsc --noEmit` must pass with zero errors.
 

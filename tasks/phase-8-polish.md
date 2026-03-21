@@ -4,6 +4,8 @@
 
 This is the final pass before shipping. No new features are introduced. Instead, every scene, animation, and interaction is audited against the design references and spec, then tuned for mobile, accessibility, reduced motion, performance, and deployment.
 
+Architecture rule for this phase: preserve shared-scene continuity. Polish work must not regress the implementation back toward duplicated per-level DOM or page-like section swaps.
+
 **Prerequisites:** Phases 0 through 7 must be complete. The full storytelling flow, all interactions, routing, and navigation should be functional before this phase begins.
 
 ---
@@ -139,16 +141,17 @@ After completing all polish work:
 2. Every scene remains usable and visually coherent at 375px viewport width
 3. Touch interactions work on a real phone or accurate device emulation
 4. With `prefers-reduced-motion: reduce` enabled, the page loads and the full story is navigable without motion sickness triggers
-5. All interactive elements are keyboard reachable with visible focus rings
-6. The captcha modal traps and restores focus correctly
-7. Images below the fold do not block initial paint
-8. Ambient animations maintain smooth frame rate on a mid-range device
-9. The production build is clean and reasonably sized
-10. The deployed GitHub Pages site loads all four routes without 404 errors
-11. `favicon.svg` appears in the browser tab
-12. Chrome, Safari, and Firefox all present the experience without critical visual or interaction differences
-13. `npx tsc --noEmit` passes with zero errors
-14. `npm run build` completes with zero errors
+5. Repeated story objects still exist as single persistent scene elements rather than duplicated responsive variants
+6. All interactive elements are keyboard reachable with visible focus rings
+7. The captcha modal traps and restores focus correctly
+8. Images below the fold do not block initial paint
+9. Ambient animations maintain smooth frame rate on a mid-range device
+10. The production build is clean and reasonably sized
+11. The deployed GitHub Pages site loads all four routes without 404 errors
+12. `favicon.svg` appears in the browser tab
+13. Chrome, Safari, and Firefox all present the experience without critical visual or interaction differences
+14. `npx tsc --noEmit` passes with zero errors
+15. `npm run build` completes with zero errors
 
 ---
 

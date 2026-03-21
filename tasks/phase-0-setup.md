@@ -2,9 +2,16 @@
 
 ## Overview
 
-Strip all Vite starter boilerplate. Install GSAP. Establish the foundational file structure, fonts, CSS tokens, scroll container, and module stubs for the scroll-driven storytelling landing page.
+Strip the Vite starter boilerplate, install GSAP, and establish the shell for a single scroll-driven scene.
 
-After this phase, the project should compile cleanly with `npm run dev`, show an empty page with the correct background color, and have all module files in place with stub exports.
+This phase must not set the project up as stacked full-screen level sections. The correct foundation is:
+
+- one scroll container
+- one sticky viewport
+- one scroll track that provides distance
+- one shared scene registry that later phases populate with persistent elements
+
+After this phase, the project should compile cleanly with `npm run dev`, show an empty sticky viewport with the correct background color, and have all module files in place with stub exports that reflect the shared-scene architecture.
 
 ---
 
@@ -14,7 +21,7 @@ After this phase, the project should compile cleanly with `npm run dev`, show an
 npm install gsap
 ```
 
-This single package includes the ScrollTrigger plugin (imported as `gsap/ScrollTrigger`).
+This single package includes the ScrollTrigger plugin.
 
 ---
 
@@ -27,7 +34,7 @@ Delete the following files entirely:
 - `src/assets/typescript.svg`
 - `src/assets/vite.svg`
 
-After deletion, the `src/assets/` directory should be empty and can be removed.
+After deletion, `src/assets/` can be removed if empty.
 
 ---
 
@@ -51,23 +58,13 @@ Replace the entire contents of `index.html` with:
 </html>
 ```
 
-Changes from the original:
-
-- Title changed from `app` to `Weichart — Apps for Humans`
-- Favicon link, viewport meta, charset, and script tag are preserved as-is
-- No other elements in `<body>` besides `#app` and the script
-
 ---
 
 ## Step 4: Replace `src/style.css`
 
-Replace the entire contents of `src/style.css` with the following. Every value is specified — do not improvise.
+Replace the entire contents of `src/style.css` with:
 
 ```css
-/* ===========================
-   Fonts
-   =========================== */
-
 @font-face {
 	font-family: "Instrument Serif";
 	font-style: normal;
@@ -84,12 +81,7 @@ Replace the entire contents of `src/style.css` with the following. Every value i
 	src: url("/InstrumentSerif-Italic.ttf") format("truetype");
 }
 
-/* ===========================
-   Custom Properties
-   =========================== */
-
 :root {
-	/* Colors */
 	--color-sky: #e1f7ff;
 	--color-page: #fefef4;
 	--color-space: #000000;
@@ -97,14 +89,9 @@ Replace the entire contents of `src/style.css` with the following. Every value i
 	--color-text-light: #000000;
 	--color-text-dark: #ffffff;
 
-	/* Fonts */
 	--font-display: "Instrument Serif", Georgia, serif;
 	--font-body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
-
-/* ===========================
-   Reset & Base
-   =========================== */
 
 *,
 *::before,
@@ -119,16 +106,12 @@ body {
 	width: 100%;
 	height: 100%;
 	overflow: hidden;
-	background: var(--color-sky);
+	background: var(--color-page);
 	color: var(--color-text-light);
 	font-family: var(--font-body);
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 }
-
-/* ===========================
-   Scroll Container
-   =========================== */
 
 #app {
 	width: 100%;
@@ -137,119 +120,191 @@ body {
 	overflow-x: hidden;
 }
 
-/* ===========================
-   Level Sections
-   =========================== */
-
-.level {
+.scene-root {
 	position: relative;
 	width: 100%;
-	min-height: 100vh;
+}
+
+.scene-viewport {
+	position: sticky;
+	top: 0;
+	width: 100%;
+	height: 100vh;
 	overflow: hidden;
+	isolation: isolate;
+	background: var(--color-page);
+}
+
+.scene-layer {
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+}
+
+.scene-layer > * {
+	pointer-events: auto;
+}
+
+.scroll-track {
+	position: relative;
+	width: 100%;
+	height: 500vh;
 }
 ```
 
-### Design notes on the CSS
+### Design Notes
 
-- `html, body` have `overflow: hidden` — all scrolling happens inside `#app`. This is required so GSAP ScrollTrigger can use `#app` as the scroll container (the `scroller` option).
-- `#app` is the sole scrollable element: `100vh` tall, `overflow-y: auto`.
-- Each level section uses class `level` and is at least `100vh` tall. Individual level modules may add their own class (e.g., `level-0`, `level-1`) for scoped styling.
-- No dark mode support — the page has its own deliberate color scheme per level.
+- `#app` remains the only scrollable element.
+- `.scene-viewport` is the one visible canvas for the whole story.
+- `.scroll-track` exists only to provide scroll distance; it does not contain duplicate visual scenes.
+- Later phases should mount elements into `.scene-layer` containers and animate those same nodes across checkpoints.
 
 ---
 
-## Step 5: Create Module Stubs
+## Step 5: Create Shared Scene Infrastructure
 
-Create the following files. Each must compile without errors under the existing `tsconfig.json` (strict mode, `noUnusedLocals`, `noUnusedParameters`).
+Create `src/scene.ts`:
+
+```typescript
+export interface Scene {
+	root: HTMLDivElement;
+	viewport: HTMLDivElement;
+	track: HTMLDivElement;
+	layers: Record<string, HTMLDivElement>;
+	refs: Record<string, HTMLElement>;
+}
+
+function createLayer(name: string): HTMLDivElement {
+	const layer = document.createElement("div");
+	layer.className = `scene-layer scene-layer-${name}`;
+	layer.dataset.layer = name;
+	return layer;
+}
+
+export function createScene(): Scene {
+	const root = document.createElement("div");
+	root.className = "scene-root";
+
+	const viewport = document.createElement("div");
+	viewport.className = "scene-viewport";
+
+	const track = document.createElement("div");
+	track.className = "scroll-track";
+
+	const layers = {
+		background: createLayer("background"),
+		world: createLayer("world"),
+		foreground: createLayer("foreground"),
+		overlay: createLayer("overlay"),
+	};
+
+	for (const layer of Object.values(layers)) {
+		viewport.appendChild(layer);
+	}
+
+	root.append(viewport, track);
+
+	return {
+		root,
+		viewport,
+		track,
+		layers,
+		refs: {},
+	};
+}
+```
+
+---
+
+## Step 6: Create Module Stubs
+
+Create the following files. These stubs deliberately work with the shared `Scene` object instead of returning full-screen sections.
 
 ### `src/levels/level0.ts`
 
 ```typescript
+import type { Scene } from "../scene";
+
 /** Level 0: Intro / Sky */
 
-export function create(): HTMLElement {
-	const section = document.createElement("section");
-	section.id = "level-0";
-	section.className = "level";
-	return section;
+export function setup(_scene: Scene): void {
+	// Phase 1: mount persistent intro elements
 }
 
-export function register(_scrollContainer: HTMLElement): void {
-	// Phase 1: hook GSAP animations
+export function register(_scene: Scene): void {
+	// Phase 1 / 7: attach intro behaviors and timeline hooks
 }
 ```
 
 ### `src/levels/level1.ts`
 
 ```typescript
+import type { Scene } from "../scene";
+
 /** Level 1: App Tree */
 
-export function create(): HTMLElement {
-	const section = document.createElement("section");
-	section.id = "level-1";
-	section.className = "level";
-	return section;
+export function setup(_scene: Scene): void {
+	// Phase 2: reuse intro tree/icon nodes and add canopy-state UI
 }
 
-export function register(_scrollContainer: HTMLElement): void {
-	// Phase 2: hook GSAP animations
+export function register(_scene: Scene): void {
+	// Phase 2 / 7: attach canopy interactions and timeline hooks
 }
 ```
 
 ### `src/levels/level2.ts`
 
 ```typescript
+import type { Scene } from "../scene";
+
 /** Level 2: Alex Watering */
 
-export function create(): HTMLElement {
-	const section = document.createElement("section");
-	section.id = "level-2";
-	section.className = "level";
-	return section;
+export function setup(_scene: Scene): void {
+	// Phase 3: mount Alex/garden elements into the shared scene
 }
 
-export function register(_scrollContainer: HTMLElement): void {
-	// Phase 3: hook GSAP animations
+export function register(_scene: Scene): void {
+	// Phase 3 / 7: attach garden behaviors and timeline hooks
 }
 ```
 
 ### `src/levels/transition23.ts`
 
 ```typescript
+import type { Scene } from "../scene";
+
 /** Level 2→3 Cinematic Transition */
 
-export function create(): HTMLElement {
-	const section = document.createElement("section");
-	section.id = "transition-2-3";
-	section.className = "level";
-	return section;
+export function setup(_scene: Scene): void {
+	// Phase 4: mount launch-only shared elements such as thrust/stars
 }
 
-export function register(_scrollContainer: HTMLElement): void {
-	// Phase 4: hook GSAP animations
+export function register(_scene: Scene): void {
+	// Phase 4 / 7: attach transition timeline hooks
 }
 ```
 
 ### `src/levels/level3.ts`
 
 ```typescript
+import type { Scene } from "../scene";
+
 /** Level 3: Space / Newsletter */
 
-export function create(): HTMLElement {
-	const section = document.createElement("section");
-	section.id = "level-3";
-	section.className = "level";
-	return section;
+export function setup(_scene: Scene): void {
+	// Phase 5: mount persistent space/newsletter elements
 }
 
-export function register(_scrollContainer: HTMLElement): void {
-	// Phase 5: hook GSAP animations
+export function register(_scene: Scene): void {
+	// Phase 5 / 7: attach ambient loops and timeline hooks
 }
 ```
 
 ### `src/captcha.ts`
 
 ```typescript
+import type { Scene } from "./scene";
+
 /** Fake captcha modal + rocket launch sequence */
 
 export function create(): HTMLElement {
@@ -258,39 +313,37 @@ export function create(): HTMLElement {
 	return overlay;
 }
 
-export function register(_scrollContainer: HTMLElement): void {
-	// Phase 6: hook captcha interactions
+export function register(_scene: Scene): void {
+	// Phase 6: hook captcha interactions against shared Level 3 refs
 }
 ```
 
 ### `src/scroll.ts`
 
 ```typescript
-/** GSAP ScrollTrigger setup, level registration, nav sync */
-
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
+import type { Scene } from "./scene";
+
 gsap.registerPlugin(ScrollTrigger);
 
-export function initScroll(_scrollContainer: HTMLElement): void {
-	// Phase 7: configure ScrollTrigger with scroller, register all levels
+export function initScroll(_scene: Scene): void {
+	// Phase 7: configure the master timeline against the shared scroll track
 }
 ```
 
 ### `src/router.ts`
 
 ```typescript
-/** URL ↔ level sync */
-
 export function initRouter(): void {
-	// Phase 7: pushState on scroll, popstate listener, direct-route jump on load
+	// Phase 7: map routes to named story checkpoints
 }
 ```
 
 ---
 
-## Step 6: Rewrite `src/main.ts`
+## Step 7: Rewrite `src/main.ts`
 
 Replace the entire contents of `src/main.ts` with:
 
@@ -303,43 +356,45 @@ import * as level2 from "./levels/level2";
 import * as transition23 from "./levels/transition23";
 import * as level3 from "./levels/level3";
 import * as captcha from "./captcha";
+import { createScene } from "./scene";
 import { initScroll } from "./scroll";
 import { initRouter } from "./router";
 
 const app = document.querySelector<HTMLDivElement>("#app")!;
+const scene = createScene();
 
-// Build DOM: append each level section in narrative order
+app.appendChild(scene.root);
+
 const levels = [level0, level1, level2, transition23, level3];
+
 for (const level of levels) {
-	app.appendChild(level.create());
+	level.setup(scene);
 }
 
-// Captcha overlay is appended to body, not the scroll container
 document.body.appendChild(captcha.create());
 
-// Initialize scroll engine and router
-initScroll(app);
+initScroll(scene);
 initRouter();
 
-// Register each level's animations with the scroll container
 for (const level of levels) {
-	level.register(app);
+	level.register(scene);
 }
-captcha.register(app);
+
+captcha.register(scene);
 ```
 
-### Why this order matters
+### Why This Order Matters
 
-1. **DOM first** — all level sections must exist before ScrollTrigger measures them.
-2. **Captcha overlay on `<body>`** — it's a fixed modal that must sit outside the scroll container so it renders above everything.
-3. **`initScroll` before `register`** — ScrollTrigger must be configured with the scroller element before individual levels add their triggers.
-4. **`initRouter` before `register`** — the router must be listening before triggers fire, so a direct-load URL can jump to the right level.
+1. The shared scene shell must exist before story modules mount persistent elements.
+2. All persistent elements should exist before the scroll engine measures the scroll track.
+3. The captcha overlay stays outside the scroll container so it can sit above the scene.
+4. The router and scroll engine are tied to checkpoints in one scene, not to separate section nodes.
 
 ---
 
-## Step 7: Verify
+## Step 8: Verify
 
-After completing all steps, run:
+Run:
 
 ```bash
 npm run dev
@@ -347,12 +402,11 @@ npm run dev
 
 Expected result:
 
-- Page loads with no console errors
-- Title reads "Weichart — Apps for Humans"
-- Favicon appears
-- Background is `#E1F7FF` (sky blue)
-- Page is blank (no visible content — the level sections are empty)
-- `npm run build` completes with no TypeScript errors
+- page loads with no console errors
+- title reads `Weichart — Apps for Humans`
+- background is `#FEFEF4`
+- the viewport is empty, sticky, and ready for mounted scene elements
+- the scroll container can scroll because the track exists, even though nothing is visible yet
 
 Also run:
 
@@ -366,11 +420,12 @@ Confirm zero errors.
 
 ## File Checklist
 
-After Phase 0, the `src/` directory should contain exactly:
+After Phase 0, `src/` should contain:
 
-```
+```text
 src/
   main.ts
+  scene.ts
   scroll.ts
   router.ts
   captcha.ts
@@ -386,7 +441,7 @@ src/
 Deleted files:
 
 - `src/counter.ts`
-- `src/assets/` (entire directory)
+- `src/assets/` if empty
 
 Modified files:
 
@@ -396,6 +451,7 @@ Modified files:
 
 New files:
 
+- `src/scene.ts`
 - `src/scroll.ts`
 - `src/router.ts`
 - `src/captcha.ts`

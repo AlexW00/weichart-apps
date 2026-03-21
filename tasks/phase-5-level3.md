@@ -2,11 +2,13 @@
 
 ## Overview
 
-Build the final story destination of the landing page: a deep-space scene where the user arrives after the rocket launch transition. This level fills exactly one viewport height and contains the newsletter subscription form embedded within the scene. The mood is silent and cosmic — vast black emptiness, a star field, and a lone planet at the bottom with a rocket waiting on its launch pad.
+Build the final story destination of the landing page: a deep-space scene where the user arrives after the rocket launch transition. The mood is silent and cosmic — vast black emptiness, a star field, and a lone planet at the bottom with a rocket waiting on its launch pad.
 
-This phase constructs the DOM for Level 3 and wires all ambient animations. No scroll driver is needed within this level — it is a static pinned scene. The Subscribe button click handler is set up here but deferred to Phase 6 for the full captcha flow.
+This is another resting state inside the shared scene, not a separate pinned section. Phase 5 should add the persistent space/newsletter elements once and define the Level 3 layout values those elements occupy when the master timeline reaches the newsletter checkpoint.
 
-**Prerequisites:** Phase 4 must be complete (the Level 2→3 transition fully implemented). Level 3 begins exactly where the transition ends: a fully black viewport covered in stars.
+The Subscribe button click handler is set up here but deferred to Phase 6 for the full captcha flow.
+
+**Prerequisites:** Phase 4 must be complete. Level 3 should begin exactly where the transition ends, using the same shared star/background layers rather than swapping to a different scene tree.
 
 ---
 
@@ -58,7 +60,7 @@ The gantry's base rests on the planet surface at the same level as the rocket's 
 
 The cat is static in its default state. It does not animate, move, or blink.
 
-**Cat state change — Phase 6 hook:** When the captcha modal opens (Phase 6), the sleeping cat image is swapped for `cat-wake.svg` (78×27px) — the same position, same alignment to the surface, but the awake variant. When the modal closes without completing the flow (user cancels), the cat swaps back to the sleeping variant. This logic is wired in Phase 6; Level 3's `create()` simply renders `cat-sleeping.svg` and exposes a way for Phase 6 to swap the asset.
+**Cat state change — Phase 6 hook:** When the captcha modal opens (Phase 6), the sleeping cat image is swapped for `cat-wake.svg` (78×27px) — the same position, same alignment to the surface, but the awake variant. When the modal closes without completing the flow (user cancels), the cat swaps back to the sleeping variant. This logic is wired in Phase 6; Level 3's `setup(scene)` should render `cat-sleeping.svg` and expose a ref Phase 6 can swap.
 
 ### Email subscription form
 
@@ -99,7 +101,7 @@ Two animations run continuously for as long as Level 3 is the active scene:
 
 **Star-blink pulse:** The `star-blink.svg` element cycles between bright and dim in a slow, breathing rhythm. The cycle period is approximately 1.5 to 2.5 seconds. The easing is smooth in both directions — a gentle sine-like curve, not a linear ramp or snap. It loops indefinitely.
 
-Both animations start when `register()` is called.
+Both animations start when `register(scene)` is called.
 
 ---
 
@@ -139,8 +141,10 @@ No Instrument Serif in this level. The email input placeholder and the Subscribe
 
 Implement in `src/levels/level3.ts`:
 
-- `create()` — builds and returns the Level 3 DOM subtree: the full-black section container; the stacked full-width star strips; the full-width planet positioned low so only its upper portion is visible; the gantry to the left of a centered rocket on the planet surface; the sleeping cat to the right of the rocket; the email form in the black space below the visible horizon; and the star-blink element in the upper-right. The cat image element should be accessible so Phase 6 can swap the `src` attribute to toggle between sleeping and awake.
-- `register()` — starts the two ambient animation loops (star field drift and star-blink pulse) and attaches the Subscribe button click handler (log email to console, call Phase 6 opener stub).
+- `setup(scene)` — mount the persistent Level 3 elements into the shared scene: planet, gantry, rocket, cat, form, and blinking star. Reuse the shared star field created for the transition instead of creating a second star background if that layer already exists.
+- `register(scene)` — start the two ambient animation loops and attach the Subscribe button click handler (log email to console, call the Phase 6 opener stub).
+
+Important: this phase defines the Level 3 resting state in the shared world. It should not mount a second black viewport or a second space scene beneath or above the transition.
 
 Add Level 3 styles to `src/style.css`, appended after the transition styles.
 
@@ -150,7 +154,7 @@ Add Level 3 styles to `src/style.css`, appended after the transition styles.
 
 After implementation, verify in the browser:
 
-1. The viewport is entirely black — no other background color anywhere
+1. The shared viewport resolves to entirely black at the newsletter checkpoint — no competing background scene is visible
 2. The star field covers the entire viewport with no gaps; stars are white dots, plus signs, and asterisks across the full area, arranged as stacked full-width strips
 3. The star strips drift slowly and continuously — watching for 10 seconds reveals gentle independent movement; the drift loops without any visible seam or jump
 4. The planet fills the viewport width, but only its upper third or so is visible; the bulk of the asset is cut off below the bottom edge
@@ -161,7 +165,8 @@ After implementation, verify in the browser:
 9. Hovering the Subscribe button shows a subtle but clear hover state change
 10. Clicking Subscribe logs the email input value to the browser console; no other action occurs
 11. The star-blink SVG is visible in the upper-right area and pulses slowly between bright and dim states in a smooth, looping rhythm
-12. On a narrow mobile viewport: the planet still spans edge to edge with most of it cut off below frame; form stacks vertically; all elements remain within viewport bounds; star strips cover the full screen
+12. No duplicate Level 3 scene root or replacement viewport was introduced; these are persistent shared-scene elements
+13. On a narrow mobile viewport: the planet still spans edge to edge with most of it cut off below frame; form stacks vertically; all elements remain within viewport bounds; star strips cover the full screen
 
 Build check: `npx tsc --noEmit` passes with zero errors.
 

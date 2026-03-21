@@ -2,9 +2,15 @@
 
 ## Overview
 
-Build the most visually dramatic moment on the entire page: a cinematic scroll-driven sequence where the garden tree transforms into a rocket and launches into space. This transition bridges Level 2 (the warm, earthy garden scene) and Level 3 (the cold, dark cosmos). It is its own scroll section — roughly two to three viewport heights tall — giving the animation enough room to play out at a measured pace tied to scroll position.
+Build the most visually dramatic moment on the page: a cinematic scroll-driven launch sequence where the garden tree transforms into a rocket and the world darkens into space.
 
-This phase constructs the DOM for the transition section and wires all scroll-driven animation via GSAP ScrollTrigger, following the same `create()` / `register()` module pattern used in previous levels.
+This transition is **not** its own standalone DOM section. It is a progress range inside the master story timeline. The sticky viewport stays the same; the scroll track simply gives this part of the story enough distance to play out at a measured pace.
+
+This phase therefore works by animating the shared scene elements already mounted in earlier phases:
+
+- the same tree from Levels 0, 1, and 2
+- the same Alex / watering can elements from Level 2
+- new transition-only elements such as thrust and stars, mounted once into the shared scene
 
 **Prerequisites:** Phase 3 must be complete (Level 2 fully implemented).
 
@@ -12,7 +18,7 @@ This phase constructs the DOM for the transition section and wires all scroll-dr
 
 ## Scene Description
 
-When the user scrolls past the bottom of Level 2, they enter this transition section. The viewport is pinned — the view does not scroll away — and instead the scroll position drives a GSAP timeline that plays the launch sequence forward as the user scrolls down, and backward if they scroll back up.
+When the user scrolls through the launch range after the garden checkpoint, the sticky viewport remains in place and scroll progress drives a GSAP timeline that plays the launch sequence forward as the user scrolls down, and backward if they scroll back up.
 
 The transition begins with the same garden scene the user just left: the tree trunk centered, Alex standing to its right, the warm cream background. As the user continues scrolling, two major parallel story threads unfold simultaneously.
 
@@ -54,7 +60,7 @@ In the mid-transition design reference, Alex has already shrunk noticeably and i
 
 Throughout the transition, the viewport background smoothly fades from the warm cream of the garden to the pure black of deep space.
 
-- At the very start of the transition section: the background is fully cream (`#FEFEF4`).
+- At the very start of the transition range: the background is fully cream (`#FEFEF4`).
 - At the very end: the background is fully black (`#000000`).
 
 The change is continuous and linear across the scroll distance — no sudden jump, no step. As the user scrolls, the background darkens progressively. By the halfway point the background is a neutral warm gray; by the end it is completely black.
@@ -77,7 +83,7 @@ Once fully in space (background fully black), the star rows drift very slowly. E
 
 At the precise moment the thrust ignites — the very start of the launch beat — the entire viewport shakes. This is a rapid, tight left-right jitter: the whole scene snaps a few pixels left, then right, then left, several times in rapid succession, lasting roughly half a second to one second. The effect evokes the ground-shaking rumble of a real rocket launch. After the shake, the scene is still and the smooth upward animation continues.
 
-The shake fires exactly once per scroll-through of this section. If the user scrolls back above the launch point and then down again, it fires again.
+The shake fires exactly once per forward pass through this transition range. If the user scrolls back above the launch point and then down again, it fires again.
 
 ---
 
@@ -89,11 +95,12 @@ At the same moment as the screen shake, if the user's device supports the Vibrat
 
 ### Scroll Control
 
-The entire transition is scroll-driven and pinned:
+The entire transition is scroll-driven:
 
-- The viewport is pinned at the top of the transition section while the user scrolls through it.
-- The scroll distance through this section (two to three viewport heights of scrollable distance) maps directly to the timeline's progress — scrolling down advances the animation; scrolling back up reverses it.
-- When the user has scrolled fully through the section, the pin releases and Level 3 begins.
+- The viewport is already sticky as part of the app shell; do not create another pinned section for this transition.
+- A dedicated range of the shared scroll track, roughly two to three viewport heights long, maps directly to this timeline segment's progress.
+- Scrolling down advances the animation; scrolling back up reverses it.
+- When the user has scrolled fully through this range, the scene has arrived at the Level 3 checkpoint.
 
 The screen shake and haptic are one-time events triggered at a specific scroll progress point (the launch moment) — they are not scrubbed or reversed with scroll direction.
 
@@ -139,8 +146,10 @@ The screen shake and haptic are one-time events triggered at a specific scroll p
 
 Implement in `src/levels/transition23.ts`:
 
-- `create()` — builds and returns the transition section's DOM subtree: the section container (sized to the full scroll height of the transition), the tree image at its Level 2 starting position, the thrust asset hidden at its starting position beneath the tree, the hands-up stickman and watering can at their Level 2 starting positions, and the star tile layer covering the full section.
-- `register(scrollContainer)` — wires all animations to a GSAP ScrollTrigger: tree rise, thrust appearance, Alex's fly-away path (position + scale + rotation), background color interpolation, star fade-in. Separately sets up the one-time screen shake (and haptic call) triggered at the launch scroll progress point. Sets up the star drift ambient loop once the background is fully black.
+- `setup(scene)` — mount only the transition-specific shared elements that do not already exist, such as the thrust layer and reusable star-strip layer
+- `register(scene)` — wire the launch segment of the master GSAP timeline: tree rise, thrust appearance, Alex's fly-away path, background color interpolation, and star fade-in. Separately set up the one-time screen shake and haptic call triggered at the launch progress point.
+
+Important: reuse the shared tree, Alex, and watering-can refs already created by earlier phases. Do not build a separate transition copy of those elements.
 
 Add transition styles to `src/style.css`, appended after the Level 2 rules.
 
@@ -148,9 +157,9 @@ Add transition styles to `src/style.css`, appended after the Level 2 rules.
 
 ## Verification Checklist
 
-After implementation, verify in the browser by scrolling slowly through the transition section:
+After implementation, verify in the browser by scrolling slowly through the transition range:
 
-1. At the very start of the section, the scene looks like Level 2 end-state — tree trunk centered, cream background, Alex to the right in hands-up pose with face photo and watering can
+1. At the very start of the range, the scene looks like the Level 2 end-state — tree trunk centered, cream background, Alex to the right in hands-up pose with face photo and watering can
 2. The first scroll movement causes the tree to begin rising upward smoothly
 3. At the launch beat, the rocket thrust appears beneath the tree — a tall colorful flame centered under the trunk
 4. Alex and watering can simultaneously begin moving toward the upper-right, shrinking and rotating as they go
@@ -160,10 +169,11 @@ After implementation, verify in the browser by scrolling slowly through the tran
 8. On a supported mobile device, a short haptic vibration fires at the same moment as the shake
 9. Scrolling back upward reverses the tree descent, thrust disappearance, Alex return, and background re-brightening — the shake does not re-fire on reverse scroll, only on forward scroll past the launch point
 10. By the end of the transition, the scene is fully black, the tree and thrust are gone above the viewport, Alex is tiny or just-exited in the upper-right, and the star field is fully visible with a gentle ambient drift
-11. The pin releases at the end of the transition section and the Level 3 scene begins
-12. Star drift motion is barely perceptible — floating and calm, not distracting
-13. On mobile (≤768px): all elements scale appropriately, star tiles fill the screen edge to edge, thrust does not overflow viewport width, shake is present but not jarring
-14. Build check: `npx tsc --noEmit` passes with zero errors
+11. No duplicate transition-only copy of the tree or Alex was introduced; the launch animates the shared refs from the earlier states
+12. At the end of the range, the story has arrived at the Level 3 checkpoint with the scene fully black
+13. Star drift motion is barely perceptible — floating and calm, not distracting
+14. On mobile (≤768px): all elements scale appropriately, star tiles fill the screen edge to edge, thrust does not overflow viewport width, shake is present but not jarring
+15. Build check: `npx tsc --noEmit` passes with zero errors
 
 ---
 
@@ -171,7 +181,7 @@ After implementation, verify in the browser by scrolling slowly through the tran
 
 | File                         | Action                                               |
 | ---------------------------- | ---------------------------------------------------- |
-| `src/style.css`              | Append transition section styles after Level 2 rules |
-| `src/levels/transition23.ts` | Replace stub with full implementation                |
+| `src/style.css`              | Append transition-range styles after Level 2 rules   |
+| `src/levels/transition23.ts` | Replace stub with shared-scene transition logic      |
 
 No new files created. No new dependencies added.

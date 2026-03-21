@@ -2,11 +2,13 @@
 
 ## Overview
 
-Build the third screen of the landing page: the base of the tree where a stick-figure character named Alex stands watering the trunk. This level fills exactly one viewport height. The visitor has scrolled down from the canopy into a warm, personal garden scene — it introduces the creator behind the apps.
+Build the third story state of the landing page: the base of the tree where a stick-figure character named Alex stands watering the trunk. The visitor has moved down from the canopy into a warm, personal garden scene, but this is still the same shared scene established earlier.
 
 The scene contains the tree trunk dominating the center, Alex (a stick figure with a real photo head) to the right holding an animated watering can, a speech bubble with a randomly chosen typed-out quote, a hand-drawn arrow labeling "This is Alex," a clickable signpost on the left, and decorative flowers.
 
-After this phase, `npm run dev` should show a complete, visually correct Level 2 matching `designs/level-2.png`. No scroll transitions between levels yet — those are wired in Phase 7.
+Architectural rule for this phase: keep using the same tree DOM from Phases 1 and 2. Reframe it so the trunk is dominant, then add Alex and the garden-specific elements into the shared scene. Do not create a separate "Level 2 tree."
+
+After this phase, `npm run dev` should show a complete, visually correct garden state matching `designs/level-2.png`. Scroll transitions between states are still wired in Phase 7.
 
 **Prerequisites:** Phase 2 must be complete (Level 1 fully implemented).
 
@@ -27,7 +29,7 @@ What's visible:
 - **Trunk:** The wide, pinkish/salmon trunk dominates the center of the viewport. It takes up roughly the middle third of the viewport width. The trunk broadens slightly as it descends, giving a natural tapering feel.
 - **Canopy peek:** The very bottom edge of the canopy is visible at the top of the viewport, or partially clipped above it. The canopy's green blob, dashed border, and ASCII decorations are all part of the `tree-colored.png` image — they peek into view at the top naturally as part of the tree asset.
 
-The tree is the same image as Levels 0 and 1 — just positioned so the trunk portion is in view. Phase 7 will unify the scroll positioning; for now, render the trunk-focused view directly.
+The tree is the same image used in Levels 0 and 1 — just reframed so the trunk portion is in view. Store this as another state of the same shared tree element rather than another rendered copy.
 
 ### Alex (stick figure, right side of trunk)
 
@@ -63,7 +65,7 @@ The arrow is `arrow.svg` (104×116px), rendered at about 80–90px. It's a hand-
 
 Near the top of the arrow, a text overlay reads **"This is Alex"** in italic serif font (Instrument Serif Italic, about 20px). The text is a CSS element positioned relative to the arrow — it is not drawn into the SVG itself.
 
-**Entry animation:** When this level becomes active (when `register()` is called), the arrow and "This is Alex" text animate in together — they fade in and slide down from slightly above their final position, over about 0.5 seconds. Before this animation fires, the arrow and text are invisible.
+**Entry animation:** When this story state becomes active, the arrow and "This is Alex" text animate in together — they fade in and slide down from slightly above their final position, over about 0.5 seconds. Before this animation fires, the arrow and text are invisible.
 
 ### Speech bubble (right of Alex)
 
@@ -170,10 +172,10 @@ The flowers are static — no animation, no interaction. They are purely decorat
 
 ## Module Structure
 
-Implement in `src/levels/level2.ts` following the architecture from Phase 0:
+Implement in `src/levels/level2.ts` following the shared-scene architecture from Phase 0:
 
-- `create()` — builds and returns the entire Level 2 DOM subtree (section element with all children: tree trunk, canopy peek, Alex figure composed of head + body + watering can, water drops container, arrow with label text, speech bubble with text area, signpost (clickable, `<` baked into SVG), flowers)
-- `register(scrollContainer)` — starts the entry animations (arrow + label fade-in/slide), begins the speech bubble typing animation with a randomly chosen quote, starts the continuous floating motion on the speech bubble and arrow, starts the watering can rocking animation and water drop cascade, sets up click/hover listeners on the signpost
+- `setup(scene)` — add Alex, the watering can, water drops container, arrow, speech bubble, signpost, and flowers to the shared scene while reusing the existing tree ref
+- `register(scene)` — start the entry animations, begin the speech bubble typing animation with a randomly chosen quote, start the floating motion on the speech bubble and arrow, start the watering can rocking animation and water drop cascade, and set up click/hover listeners on the signpost
 
 Add Level 2 styles to `src/style.css`, appended after the Level 1 rules.
 
@@ -197,7 +199,8 @@ After implementation, visually confirm in the browser:
 12. Hovering the signpost brightens the image; clicking opens `https://alexanderweichart.de` in a new tab
 13. Two or three small flowers sit near the base of the signpost
 14. Layer order correct: speech bubble and arrow in front, Alex in front of trunk, signpost and flowers in front of background
-15. On mobile (≤768px): all elements scale down, speech bubble repositions for narrow screens, signpost stays left-anchored, nothing overflows
+15. The trunk view is achieved by repositioning the shared tree node rather than mounting a new tree DOM subtree
+16. On mobile (≤768px): all elements scale down, speech bubble repositions for narrow screens, signpost stays left-anchored, nothing overflows
 
 Build check: `npx tsc --noEmit` must pass with zero errors.
 

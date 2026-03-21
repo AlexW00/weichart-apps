@@ -2,9 +2,11 @@
 
 ## Overview
 
-Build the second screen of the landing page: a zoomed-in view of the tree canopy where the three app icons are large, prominent, and interactive. This level fills exactly one viewport height. The visitor has conceptually "moved closer" to the canopy — everything about the tree and its decorations is now much bigger and more detailed.
+Build the second story state of the landing page: a zoomed-in canopy view where the three app icons are large, prominent, and interactive. The visitor has conceptually moved closer to the canopy, but this is still the same shared world from Phase 1.
 
-After this phase, `npm run dev` should show a complete, visually correct Level 1 matching `designs/level-1.png` (default state) and `designs/level-1-hover-app.png` (hover state). No scroll transitions between Level 0 and Level 1 yet — those are wired in Phase 7.
+Architectural rule for this phase: do not create a second tree and do not create a second copy of the icons. Reuse the persistent tree and icon nodes from Phase 1, then apply different scale/position values for the canopy-focused state. The only genuinely new DOM here should be canopy-specific UI such as the label area.
+
+After this phase, `npm run dev` should be able to present a visually correct canopy state matching `designs/level-1.png` (default) and `designs/level-1-hover-app.png` (hover). Cross-state scroll choreography is still deferred to Phase 7.
 
 **Prerequisites:** Phase 1 must be complete (Level 0 fully implemented, canopy shape and app icons exist in Level 0).
 
@@ -34,7 +36,13 @@ Below the canopy ellipse, the very top of the trunk is visible. The pinkish/salm
 
 ### Important implementation note
 
-This level reuses the **same tree image** from Level 0. In the final product, the scroll transition from Level 0 to Level 1 will scale and translate the tree upward so it appears to zoom in (Phase 7 handles this). For now, build Level 1 as an independent, static section that visually shows the zoomed-in view of `tree-colored.png` — simply display the same tree image at a much larger scale, centered so the canopy portion fills the viewport. Phase 7 will later unify these into a single scrolling transition.
+This phase must operate on the **same tree image and icon row created in Level 0**.
+
+- Do not render a new `tree-colored.png` node for the canopy state.
+- Do not render duplicate app icons just because they are larger here.
+- Instead, store and reuse the shared refs from Phase 1, and define the canopy-state transform/layout values that make the existing nodes appear zoomed in.
+
+The final product should therefore feel like one tree being scaled and reframed, not one tree scrolling away while a different tree scrolls in.
 
 ---
 
@@ -153,10 +161,10 @@ This ensures mobile users can discover app names and descriptions. Use the `hove
 
 ## Module Structure
 
-Implement in `src/levels/level1.ts` following the architecture from Phase 0:
+Implement in `src/levels/level1.ts` following the shared-scene architecture from Phase 0:
 
-- `create()` — builds and returns the entire Level 1 DOM subtree (section element with all children: tree image scaled large, icons, label area)
-- `register(scrollContainer)` — sets up hover/touch event listeners on the app icons, wires up label display logic
+- `setup(scene)` — mount the label area and any canopy-only wrappers or refs needed for interactions, while reusing the tree and icon refs created in Phase 1
+- `register(scene)` — set up hover/touch event listeners on the shared icon nodes and wire the label display logic
 
 Add Level 1 styles to `src/style.css`, appended after the Level 0 rules.
 
@@ -167,8 +175,8 @@ Add Level 1 styles to `src/style.css`, appended after the Level 0 rules.
 After implementation, visually confirm in the browser:
 
 1. Entire viewport is cream (`#FEFEF4`)
-2. Tree image scaled large so canopy fills most of the viewport — the green blob, dashed border, and ASCII decorations are all visible as part of the image
-3. Top of the pinkish trunk is visible at the bottom of the viewport (part of the same tree image)
+2. The existing shared tree image from Phase 1 is scaled/reframed so the canopy fills most of the viewport — the green blob, dashed border, and ASCII decorations remain part of the same image node
+3. Top of the pinkish trunk is visible at the bottom of the viewport (still part of that same tree image)
 4. Three app icons are large (~130px), horizontally centered, with gaps between them
 5. Icons have white backgrounds, rounded corners, and subtle shadows
 6. Zeitgeist icon (center) is visually distinct with its dark background
@@ -177,7 +185,8 @@ After implementation, visually confirm in the browser:
 9. Moving hover between icons: label transitions smoothly between app data
 10. Leaving hover: label fades out
 11. On mobile (≤768px): icons shrink, text scales down, touch-tap toggles label display
-12. Layer order correct: label text above icons, icons above tree image
+12. No duplicate tree or duplicate icon DOM was introduced for the canopy state
+13. Layer order correct: label text above icons, icons above tree image
 
 Build check: `npx tsc --noEmit` must pass with zero errors.
 

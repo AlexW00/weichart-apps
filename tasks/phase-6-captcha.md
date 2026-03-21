@@ -6,6 +6,8 @@ Build the interactive finale of the newsletter scene: clicking `Subscribe` opens
 
 This is not a real captcha and not a real form submission flow. It is a theatrical interaction layered on top of Level 3. The goal is to make the user feel like they have triggered a tiny absurd ceremony before the rocket leaves.
 
+Architectural rule for this phase: operate entirely on the persistent Level 3 scene refs created in Phase 5. Do not create a second rocket, second cat, or second newsletter scene for the modal/launch flow.
+
 **Prerequisites:** Phase 5 must be complete. The Level 3 scene already exists with the black background, vertically repeated star strips, full-width cropped planet, centered rocket, left-side gantry, sleeping cat, and email form.
 
 ---
@@ -306,8 +308,9 @@ After implementation, verify in the browser:
 13. The cat stays awake during countdown and launch, then returns to sleeping once the rocket is gone
 14. After launch, the rocket and thrust are no longer visible, the popup is gone, and the final scene matches the finished design state
 15. After launch, the email input and `Subscribe` button are still visible but disabled
-16. The popup scales correctly on mobile and remains usable with touch input
-17. Build check: `npx tsc --noEmit` passes with zero errors
+16. The launch flow reuses the existing Level 3 rocket/cat/form elements rather than swapping to duplicated launch-only scene markup
+17. The popup scales correctly on mobile and remains usable with touch input
+18. Build check: `npx tsc --noEmit` passes with zero errors
 
 ---
 

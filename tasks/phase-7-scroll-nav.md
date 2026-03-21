@@ -2,7 +2,7 @@
 
 ## Overview
 
-Wire the finished scenes into one coherent storytelling machine. This phase does not introduce a new visual level; it makes the existing levels behave like a single guided journey with scroll progression, URL synchronization, and persistent level navigation controls.
+Wire the finished story states into one coherent storytelling machine. This phase does not introduce a new visual world; it makes the existing shared scene behave like a single guided journey with scroll progression, URL synchronization, and persistent navigation controls.
 
 By the end of this phase, the page should feel like one continuous narrative that can be explored in three equivalent ways:
 
@@ -32,15 +32,21 @@ The transition is part of the journey between `/about` and `/newsletter`, but it
 
 The page behaves as one vertical story inside the dedicated scroll container established earlier.
 
-Each major level occupies its own scroll stage. Moving through the page should feel authored rather than like free-form document scrolling:
+Implementation rule: do not wire this as a stack of full-screen sections with duplicated scene elements. Instead:
 
-- Level 0 settles into its intro composition
-- scrolling advances into Level 1
-- scrolling continues into Level 2
-- scrolling then enters the pinned Level 2→3 transition
-- the transition releases into Level 3
+- the sticky viewport remains constant
+- the scroll track provides distance
+- one master GSAP timeline scrubs the shared scene through named checkpoints
 
-The user should feel the page moving between intentional scenes, not between unrelated blocks of content.
+Moving through the page should feel authored rather than like free-form document scrolling:
+
+- intro checkpoint
+- canopy/apps checkpoint
+- garden/about checkpoint
+- launch transition range
+- newsletter checkpoint
+
+The user should feel the camera and the objects changing inside one world, not the DOM swapping between unrelated blocks.
 
 ### Active level logic
 
@@ -125,7 +131,7 @@ The movement should feel equivalent to a well-paced scroll progression:
 - Up from Level 3 goes back toward Level 2 through the transition
 - Down from Level 2 proceeds toward Level 3 through the transition
 
-The navigation should respect the same story transitions already built. It must not bypass the cinematic Level 2→3 section.
+The navigation should respect the same story transitions already built. It must not bypass the cinematic Level 2→3 range on the master timeline.
 
 ### Edge states
 
@@ -168,7 +174,7 @@ Whenever the system moves to a major level programmatically — whether from a n
 - the scroll engine and GSAP state stay in sync
 - the page does not overshoot, bounce, or stop at partial intermediate offsets
 
-This is especially important for the `/about` ↔ `/newsletter` pair because their relationship includes the pinned transition section.
+This is especially important for the `/about` ↔ `/newsletter` pair because their relationship includes the launch transition range.
 
 ---
 
@@ -178,9 +184,9 @@ The scroll engine must remain stable if the viewport size changes.
 
 ### On resize
 
-- section measurements recalculate correctly
-- route-to-position mapping remains accurate
-- pinned transition timing still lines up with the visual scenes
+- scroll-track measurements recalculate correctly
+- route-to-progress mapping remains accurate
+- launch transition timing still lines up with the visual checkpoints
 - the bottom-right navigation stays anchored to the viewport corner
 
 ### On refresh
@@ -208,9 +214,9 @@ If keyboard scrolling is used, route synchronization should still behave correct
 
 Implement the global orchestration described in the implementation plan:
 
-- `src/scroll.ts` manages the story-level scroll positions, active-level detection, and programmatic movement between levels
-- `src/router.ts` maps between routes and major level ids, handles `pushState`, and responds to `popstate`
-- `src/main.ts` boots the levels, scroll engine, router, and bottom-right navigation control
+- `src/scroll.ts` manages the master timeline, checkpoint progress, active-level detection, and programmatic movement between checkpoints
+- `src/router.ts` maps between routes and named checkpoint ids, handles `pushState`, and responds to `popstate`
+- `src/main.ts` boots the shared scene, level modules, scroll engine, router, and bottom-right navigation control
 
 If a small dedicated navigation helper is useful, keep it lightweight and consistent with the existing module structure.
 
@@ -224,22 +230,23 @@ After implementation, verify in the browser:
 
 1. Natural scrolling progresses through the story in order: Level 0 → Level 1 → Level 2 → transition → Level 3
 2. The page feels like one authored narrative rather than unrelated stacked sections
-3. Visiting `/` opens Level 0 directly
-4. Visiting `/apps` opens Level 1 directly
-5. Visiting `/about` opens Level 2 directly
-6. Visiting `/newsletter` opens the normal pre-launch Level 3 scene directly
-7. Browser back/forward moves to the correct major level without reload glitches
-8. The URL updates as the user moves between major levels, but does not flicker excessively near boundaries
-9. The bottom-right up/down controls remain visible across the whole story
-10. Clicking the nav buttons moves between levels at a controlled speed and follows the same transitions as normal scrolling
-11. Moving between `/about` and `/newsletter` still passes through the cinematic transition rather than jumping past it
-12. At the first level, the up control is visibly disabled; at the last level, the down control is visibly disabled
-13. During the captcha countdown and rocket launch, scrolling and nav buttons are temporarily blocked
-14. After the launch settles, scrolling and nav controls work again while staying on `/newsletter`
-15. Refreshing the page on any supported route returns to that same major level
-16. Resizing the viewport does not break scene alignment or route mapping
-17. Nav controls are keyboard reachable, labeled, and visibly focusable
-18. Build check: `npx tsc --noEmit` passes with zero errors
+3. Repeated scene elements such as the tree are visibly transformed across states rather than replaced by duplicate DOM
+4. Visiting `/` opens Level 0 directly
+5. Visiting `/apps` opens Level 1 directly
+6. Visiting `/about` opens Level 2 directly
+7. Visiting `/newsletter` opens the normal pre-launch Level 3 scene directly
+8. Browser back/forward moves to the correct major level without reload glitches
+9. The URL updates as the user moves between major levels, but does not flicker excessively near boundaries
+10. The bottom-right up/down controls remain visible across the whole story
+11. Clicking the nav buttons moves between levels at a controlled speed and follows the same transitions as normal scrolling
+12. Moving between `/about` and `/newsletter` still passes through the cinematic transition rather than jumping past it
+13. At the first level, the up control is visibly disabled; at the last level, the down control is visibly disabled
+14. During the captcha countdown and rocket launch, scrolling and nav buttons are temporarily blocked
+15. After the launch settles, scrolling and nav controls work again while staying on `/newsletter`
+16. Refreshing the page on any supported route returns to that same major level
+17. Resizing the viewport does not break scene alignment or route mapping
+18. Nav controls are keyboard reachable, labeled, and visibly focusable
+19. Build check: `npx tsc --noEmit` passes with zero errors
 
 ---
 
