@@ -1,60 +1,157 @@
 import './style.css'
-import typescriptLogo from './assets/typescript.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import { setupCounter } from './counter.ts'
 
-document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-<section id="center">
-  <div class="hero">
-    <img src="${heroImg}" class="base" width="170" height="179">
-    <img src="${typescriptLogo}" class="framework" alt="TypeScript logo"/>
-    <img src=${viteLogo} class="vite" alt="Vite logo" />
-  </div>
-  <div>
-    <h1>Get started</h1>
-    <p>Edit <code>src/main.ts</code> and save to test <code>HMR</code></p>
-  </div>
-  <button id="counter" type="button" class="counter"></button>
-</section>
+// ── Typing animation for "Humans" ──
+const words = ['Humans', 'Menschen', '人間', 'Humanos', 'Humans']
+let wordIndex = 0
+let charIndex = 0
+let isDeleting = false
+const typingEl = document.getElementById('typing-word')!
 
-<div class="ticks"></div>
+function typeLoop() {
+  const current = words[wordIndex]
 
-<section id="next-steps">
-  <div id="docs">
-    <svg class="icon" role="presentation" aria-hidden="true"><use href="/icons.svg#documentation-icon"></use></svg>
-    <h2>Documentation</h2>
-    <p>Your questions, answered</p>
-    <ul>
-      <li>
-        <a href="https://vite.dev/" target="_blank">
-          <img class="logo" src=${viteLogo} alt="" />
-          Explore Vite
-        </a>
-      </li>
-      <li>
-        <a href="https://www.typescriptlang.org" target="_blank">
-          <img class="button-icon" src="${typescriptLogo}" alt="">
-          Learn more
-        </a>
-      </li>
-    </ul>
-  </div>
-  <div id="social">
-    <svg class="icon" role="presentation" aria-hidden="true"><use href="/icons.svg#social-icon"></use></svg>
-    <h2>Connect with us</h2>
-    <p>Join the Vite community</p>
-    <ul>
-      <li><a href="https://github.com/vitejs/vite" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#github-icon"></use></svg>GitHub</a></li>
-      <li><a href="https://chat.vite.dev/" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#discord-icon"></use></svg>Discord</a></li>
-      <li><a href="https://x.com/vite_js" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#x-icon"></use></svg>X.com</a></li>
-      <li><a href="https://bsky.app/profile/vite.dev" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#bluesky-icon"></use></svg>Bluesky</a></li>
-    </ul>
-  </div>
-</section>
+  if (!isDeleting) {
+    typingEl.textContent = current.slice(0, charIndex + 1)
+    charIndex++
 
-<div class="ticks"></div>
-<section id="spacer"></section>
-`
+    if (charIndex === current.length) {
+      setTimeout(() => {
+        isDeleting = true
+        typeLoop()
+      }, 2500)
+      return
+    }
+    setTimeout(typeLoop, 100 + Math.random() * 60)
+  } else {
+    typingEl.textContent = current.slice(0, charIndex)
+    charIndex--
 
-setupCounter(document.querySelector<HTMLButtonElement>('#counter')!)
+    if (charIndex < 0) {
+      isDeleting = false
+      charIndex = 0
+      wordIndex = (wordIndex + 1) % words.length
+      setTimeout(typeLoop, 400)
+      return
+    }
+    setTimeout(typeLoop, 50 + Math.random() * 30)
+  }
+}
+
+// Start typing after initial pause
+setTimeout(() => {
+  typingEl.textContent = words[0]
+  charIndex = words[0].length
+  setTimeout(() => {
+    isDeleting = true
+    typeLoop()
+  }, 3000)
+}, 2000)
+
+// ── Scroll-driven animation ──
+const treeContainer = document.getElementById('tree-container')!
+const titleEl = document.getElementById('title')!
+const cloudsEl = document.getElementById('clouds')!
+const appIcons = document.querySelectorAll<HTMLElement>('.app-icon')
+const appInfo = document.getElementById('app-info')!
+const appNameEl = document.getElementById('app-name')!
+const appSubtitleEl = document.getElementById('app-subtitle')!
+
+// Tree sizing (vh units)
+const TREE_MIN = 75
+const TREE_MAX = 105 // slightly over viewport so trunk base is below fold
+
+// Tree starts pushed down so trunk is cut off at bottom
+const TREE_OFFSET_START = 20 // vh below viewport bottom
+const TREE_OFFSET_END = 0   // fully in frame at end of growth
+
+// Phase split: 0→0.55 = tree growth, 0.55→1.0 = app highlights
+const GROWTH_END = 0.55
+
+let currentHighlight = -1
+let isHovering = false
+
+function showAppInfo(index: number) {
+  if (index < 0 || index >= appIcons.length) {
+    appInfo.classList.remove('visible')
+    appIcons.forEach(icon => icon.classList.remove('highlighted'))
+    currentHighlight = -1
+    return
+  }
+
+  const icon = appIcons[index]
+  appNameEl.textContent = icon.dataset.name ?? ''
+  appSubtitleEl.textContent = icon.dataset.subtitle ?? ''
+  appInfo.classList.add('visible')
+
+  appIcons.forEach((ic, i) => {
+    ic.classList.toggle('highlighted', i === index)
+  })
+  currentHighlight = index
+}
+
+function easeOutCubic(t: number): number {
+  return 1 - (1 - t) ** 3
+}
+
+function onScroll() {
+  const maxScroll = document.body.scrollHeight - window.innerHeight
+  const progress = Math.min(window.scrollY / maxScroll, 1)
+
+  // ── Phase 1: Tree growth + title/cloud fade ──
+  const growthT = Math.min(progress / GROWTH_END, 1)
+  const eased = easeOutCubic(growthT)
+
+  // Tree height + vertical offset (starts pushed down, scrolls into frame)
+  const treeVh = TREE_MIN + (TREE_MAX - TREE_MIN) * eased
+  const treeOffset = TREE_OFFSET_START + (TREE_OFFSET_END - TREE_OFFSET_START) * eased
+  treeContainer.style.height = `${treeVh}vh`
+  treeContainer.style.bottom = `${-treeOffset}vh`
+
+  // Title: shrinks and rises up as user scrolls down, fades out quickly
+  const titleFade = Math.max(1 - growthT * 3.5, 0)
+  const titleScale = Math.max(1 - growthT * 2, 0.3)
+  const titleShift = -growthT * 150 // moves up
+  titleEl.style.opacity = String(titleFade)
+  titleEl.style.transform = `translateX(-50%) translateY(${titleShift}px) scale(${titleScale})`
+
+  // Clouds: fade and rise with tree
+  const cloudFade = Math.max(0.55 - growthT * 1.4, 0)
+  const cloudShift = -growthT * 80
+  cloudsEl.style.opacity = String(cloudFade)
+  cloudsEl.style.transform = `translateY(${cloudShift}px)`
+
+  // App icons: fade in with tree growth, no interaction until fully grown
+  const iconsInteractable = growthT >= 1
+  appIcons.forEach(icon => {
+    icon.style.opacity = String(eased)
+    icon.style.pointerEvents = iconsInteractable ? 'auto' : 'none'
+  })
+
+  // ── Phase 2: Highlight apps sequentially via scroll ──
+  if (!isHovering) {
+    if (progress > GROWTH_END) {
+      const hlT = (progress - GROWTH_END) / (1 - GROWTH_END)
+      const count = appIcons.length
+      const idx = Math.min(Math.floor(hlT * count), count - 1)
+      if (idx !== currentHighlight) showAppInfo(idx)
+    } else if (currentHighlight >= 0) {
+      showAppInfo(-1)
+    }
+  }
+}
+
+// ── Hover interactions ──
+appIcons.forEach((icon) => {
+  icon.addEventListener('mouseenter', () => {
+    isHovering = true
+    showAppInfo(parseInt(icon.dataset.index ?? '-1', 10))
+  })
+  icon.addEventListener('mouseleave', () => {
+    isHovering = false
+    onScroll() // restore scroll-driven state
+  })
+})
+
+// ── Init ──
+window.addEventListener('scroll', onScroll, { passive: true })
+onScroll()

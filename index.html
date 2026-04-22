@@ -4,10 +4,57 @@
 		<meta charset="UTF-8" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>app</title>
+		<title>Weichart — Apps for Humans</title>
 	</head>
 	<body>
-		<div id="app"></div>
+		<div id="scene">
+			<!-- Cloud marquee -->
+			<div id="clouds">
+				<div class="cloud-strip">
+					<img src="/cloud-colored.png" alt="" class="cloud" />
+					<img src="/cloud-colored.png" alt="" class="cloud" />
+					<img src="/cloud-colored.png" alt="" class="cloud" />
+					<img src="/cloud-colored.png" alt="" class="cloud" />
+					<img src="/cloud-colored.png" alt="" class="cloud" />
+					<img src="/cloud-colored.png" alt="" class="cloud" />
+					<img src="/cloud-colored.png" alt="" class="cloud" />
+					<img src="/cloud-colored.png" alt="" class="cloud" />
+					<img src="/cloud-colored.png" alt="" class="cloud" />
+					<img src="/cloud-colored.png" alt="" class="cloud" />
+					<img src="/cloud-colored.png" alt="" class="cloud" />
+					<img src="/cloud-colored.png" alt="" class="cloud" />
+				</div>
+			</div>
+
+			<!-- Title -->
+			<div id="title">
+				<h1>Weichart</h1>
+				<p class="subtitle">Apps for <span id="typing-word">Humans</span><span id="cursor">|</span></p>
+			</div>
+
+			<!-- Tree with apps -->
+			<div id="tree-container">
+				<img id="tree" src="/tree-colored.png" alt="A tree made of code" />
+
+				<!-- App info label (shown on hover/scroll highlight) -->
+				<div id="app-info">
+					<h2 id="app-name"></h2>
+					<p id="app-subtitle"></p>
+				</div>
+
+				<!-- App icons -->
+				<div class="app-icon" data-index="0" data-name="Zettel" data-subtitle="Minimalist Quick Notes">
+					<img src="/zettel-icon.png" alt="Zettel" />
+				</div>
+				<div class="app-icon" data-index="1" data-name="Zeitgeist" data-subtitle="Your Time, Organized">
+					<img src="/zeitgeist-icon.png" alt="Zeitgeist" />
+				</div>
+				<div class="app-icon" data-index="2" data-name="?" data-subtitle="Coming Soon">
+					<img src="/next-icon.png" alt="Coming soon" />
+				</div>
+			</div>
+		</div>
+
 		<script type="module" src="/src/main.ts"></script>
 	</body>
 </html>
