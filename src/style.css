@@ -105,10 +105,9 @@ body {
 /* ── Title ── */
 #title {
   position: absolute;
-  top: 18vh;
+  top: 22vh;
   left: 50%;
   transform: translateX(-50%);
-  text-align: center;
   z-index: 2;
   white-space: nowrap;
   will-change: opacity, transform;
@@ -117,19 +116,22 @@ body {
 #title h1 {
   font-family: 'Instrument Serif', Georgia, serif;
   font-weight: 400;
-  font-size: clamp(4rem, 11vw, 9rem);
+  font-size: clamp(5rem, 14vw, 12rem);
   color: #1a1a1a;
   line-height: 1;
-  margin-bottom: 0.15em;
   letter-spacing: -0.02em;
 }
 
 #title .subtitle {
+  position: absolute;
+  left: 85%;
+  bottom: -0.5em;
   font-family: 'Instrument Serif', Georgia, serif;
   font-style: italic;
-  font-size: clamp(1.25rem, 3.2vw, 2rem);
+  font-size: clamp(1rem, 2.5vw, 1.6rem);
   color: #555;
   letter-spacing: 0.02em;
+  text-align: left;
 }
 
 #typing-word {
