@@ -39,21 +39,39 @@
 			<div id="tree-container">
 				<img id="tree" src="/tree-colored.png" alt="A tree made of code" />
 
-				<!-- App info label (shown on hover/scroll highlight) -->
-				<div id="app-info">
-					<h2 id="app-name"></h2>
-					<p id="app-subtitle"></p>
-				</div>
-
-				<!-- App icons -->
-				<div class="app-icon" data-index="0" data-name="Zettel" data-subtitle="Minimalist Quick Notes">
+				<!-- App icons (triangle: apex, left base, right base) -->
+				<div
+					class="app-icon"
+					data-index="0"
+					data-name="Zettel"
+					data-subtitle="Minimalist Quick Notes"
+					tabindex="0"
+				>
 					<img src="/zettel-icon.png" alt="Zettel" />
+					<div class="app-tooltip" role="tooltip">
+						<span class="app-tooltip__name">Zettel</span>
+						<span class="app-tooltip__subtitle">Minimalist Quick Notes</span>
+					</div>
 				</div>
-				<div class="app-icon" data-index="1" data-name="Zeitgeist" data-subtitle="Your Time, Organized">
+				<div
+					class="app-icon"
+					data-index="1"
+					data-name="Zeitgeist"
+					data-subtitle="Your Time, Organized"
+					tabindex="0"
+				>
 					<img src="/zeitgeist-icon.png" alt="Zeitgeist" />
+					<div class="app-tooltip" role="tooltip">
+						<span class="app-tooltip__name">Zeitgeist</span>
+						<span class="app-tooltip__subtitle">Your Time, Organized</span>
+					</div>
 				</div>
-				<div class="app-icon" data-index="2" data-name="?" data-subtitle="Coming Soon">
+				<div class="app-icon" data-index="2" data-name="?" data-subtitle="Coming Soon" tabindex="0">
 					<img src="/next-icon.png" alt="Coming soon" />
+					<div class="app-tooltip" role="tooltip">
+						<span class="app-tooltip__name">?</span>
+						<span class="app-tooltip__subtitle">Coming Soon</span>
+					</div>
 				</div>
 			</div>
 		</div>

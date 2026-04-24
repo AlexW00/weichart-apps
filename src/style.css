@@ -72,7 +72,9 @@ body {
   display: flex;
   align-items: flex-start;
   gap: 3vw;
+  /* --marquee-copies: how many 12-image units are tiled (set in JS) */
   animation: marquee 80s linear infinite;
+  backface-visibility: hidden;
   width: max-content;
 }
 
@@ -83,23 +85,26 @@ body {
   flex-shrink: 0;
 }
 
-/* Scatter clouds vertically */
-.cloud:nth-child(1)  { transform: translateY(1vh); }
-.cloud:nth-child(2)  { transform: translateY(5vh); }
-.cloud:nth-child(3)  { transform: translateY(0vh); }
-.cloud:nth-child(4)  { transform: translateY(3vh); }
-.cloud:nth-child(5)  { transform: translateY(7vh); }
-.cloud:nth-child(6)  { transform: translateY(1.5vh); }
-.cloud:nth-child(7)  { transform: translateY(6vh); }
-.cloud:nth-child(8)  { transform: translateY(0.5vh); }
-.cloud:nth-child(9)  { transform: translateY(4vh); }
-.cloud:nth-child(10) { transform: translateY(7.5vh); }
-.cloud:nth-child(11) { transform: translateY(2vh); }
-.cloud:nth-child(12) { transform: translateY(6.5vh); }
+/* Scatter clouds vertically (repeats for each tiled copy of the 12-image unit) */
+.cloud:nth-child(12n+1)  { transform: translateY(1vh); }
+.cloud:nth-child(12n+2)  { transform: translateY(5vh); }
+.cloud:nth-child(12n+3)  { transform: translateY(0vh); }
+.cloud:nth-child(12n+4)  { transform: translateY(3vh); }
+.cloud:nth-child(12n+5)  { transform: translateY(7vh); }
+.cloud:nth-child(12n+6)  { transform: translateY(1.5vh); }
+.cloud:nth-child(12n+7)  { transform: translateY(6vh); }
+.cloud:nth-child(12n+8)  { transform: translateY(0.5vh); }
+.cloud:nth-child(12n+9)  { transform: translateY(4vh); }
+.cloud:nth-child(12n+10) { transform: translateY(7.5vh); }
+.cloud:nth-child(12n+11) { transform: translateY(2vh); }
+.cloud:nth-child(12n+12) { transform: translateY(6.5vh); }
 
 @keyframes marquee {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  0% { transform: translate3d(0, 0, 0); }
+  100% {
+    /* One full pattern width per copy so the loop is seamless (default 2 = -50%) */
+    transform: translate3d(calc(-100% / var(--marquee-copies, 2)), 0, 0);
+  }
 }
 
 /* ── Title ── */
@@ -175,11 +180,16 @@ body {
   position: absolute;
   width: 9%;
   cursor: pointer;
-  transition: transform 0.3s ease, filter 0.25s ease;
+  transition: transform 0.3s ease, z-index 0s linear 0.15s;
   z-index: 4;
   /* Center the icon on its position point */
   transform: translate(-50%, -50%);
   opacity: 1;
+}
+
+.app-icon:hover {
+  z-index: 8;
+  transition: transform 0.3s ease, z-index 0s;
 }
 
 .app-icon img {
@@ -189,62 +199,103 @@ body {
   border-radius: 18%;
 }
 
-/* Position icons within the tree canopy
-   The canopy fills roughly top 0-65% of the tree image.
-   Icons sit at ~50% height (middle of canopy), spread horizontally. */
+/* Triangle layout within canopy: apex (top), left base, right base */
 .app-icon[data-index="0"] {
-  top: 42%;
-  left: 30%;
-}
-.app-icon[data-index="1"] {
-  top: 42%;
+  top: 34%;
   left: 50%;
 }
+.app-icon[data-index="1"] {
+  top: 52%;
+  left: 32%;
+}
 .app-icon[data-index="2"] {
-  top: 42%;
-  left: 70%;
+  top: 52%;
+  left: 68%;
 }
 
 /* Hover / highlighted state */
 .app-icon:hover,
 .app-icon.highlighted {
   transform: translate(-50%, -50%) scale(1.12);
-  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.15));
 }
 
-/* ── App info label (shown on hover/scroll highlight) ── */
-#app-info {
+/* ── Hover tooltip ── */
+.app-tooltip {
   position: absolute;
-  top: 23.5%;
   left: 50%;
-  transform: translateX(-50%);
+  bottom: calc(100% + 0.65rem);
+  transform: translate3d(-50%, 6px, 0);
+  min-width: 10rem;
+  max-width: min(16rem, 70vw);
+  padding: 0.65rem 0.85rem 0.7rem;
   text-align: center;
-  opacity: 0;
-  transition: opacity 0.3s ease;
   pointer-events: none;
-  z-index: 5;
-  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.22s ease,
+    transform 0.22s ease,
+    visibility 0.22s;
+  border-radius: 12px;
+  background: rgba(255, 255, 252, 0.92);
+  border: 1px solid rgba(26, 26, 26, 0.08);
+  box-shadow:
+    0 4px 24px rgba(26, 26, 26, 0.12),
+    0 1px 3px rgba(26, 26, 26, 0.06);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 1;
 }
 
-#app-info.visible {
+.app-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -7px;
+  border: 7px solid transparent;
+  border-top-color: rgba(255, 255, 252, 0.92);
+  filter: drop-shadow(0 2px 1px rgba(26, 26, 26, 0.06));
+}
+
+.app-icon:hover .app-tooltip,
+.app-icon:focus-visible .app-tooltip {
   opacity: 1;
+  visibility: visible;
+  transform: translate3d(-50%, 0, 0);
 }
 
-#app-name {
+.app-tooltip__name {
+  display: block;
   font-family: 'Instrument Serif', Georgia, serif;
   font-weight: 400;
-  font-size: 2rem;
+  font-size: clamp(1.05rem, 2.2vw, 1.35rem);
   color: #1a1a1a;
   line-height: 1.2;
-  margin: 0;
 }
 
-#app-subtitle {
+.app-tooltip__subtitle {
+  display: block;
+  margin-top: 0.2em;
   font-family: 'Instrument Serif', Georgia, serif;
   font-style: italic;
-  font-size: clamp(0.75rem, 1.5vw, 1.05rem);
-  color: #666;
-  margin: 0.1em 0 0;
+  font-size: clamp(0.68rem, 1.35vw, 0.88rem);
+  color: #555;
+  line-height: 1.35;
+}
+
+.app-tooltip__subtitle:empty {
+  display: none;
+}
+
+.app-icon:focus {
+  outline: none;
+}
+
+.app-icon:focus-visible {
+  outline: 2px solid var(--humans-color);
+  outline-offset: 4px;
+  border-radius: 22%;
 }
 
 /* ── Mobile adjustments ── */
@@ -264,6 +315,11 @@ body {
 
   .app-icon {
     width: 9%;
+  }
+
+  .app-tooltip {
+    min-width: 8.5rem;
+    padding: 0.55rem 0.7rem 0.6rem;
   }
 }
 
