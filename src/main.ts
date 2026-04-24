@@ -72,7 +72,7 @@ const TREE_H = 827
 
 // Tree starts pushed down so trunk is cut off at bottom
 const TREE_OFFSET_START = 20 // vh below viewport bottom
-const TREE_OFFSET_END = 0   // fully in frame at end of growth
+const TREE_OFFSET_END = 5   // trunk base below viewport at end of growth
 
 /** Matches @media (max-width) for #title in style.css (centered block + stacked subtitle). */
 const MOBILE_TITLE_LAYOUT_MAX_WIDTH = 600
@@ -86,7 +86,8 @@ const TREE_GROW_EASED_MAX = 0.14
 /** Mobile tree constants — smaller start, width-capped growth, no extra scale. */
 const TREE_MIN_MOBILE = 35
 const TREE_MAX_MOBILE = 55  // usually capped by viewport-width constraint
-const TREE_OFFSET_START_MOBILE = 5
+const TREE_OFFSET_START_MOBILE = 6
+const TREE_OFFSET_END_MOBILE = 1  // trunk base just below viewport
 
 /** Max tree height (px) so width = height * (W/H) does not exceed viewport with margins on each side. */
 function maxTreeHeightPx(): number {
@@ -192,7 +193,7 @@ function onScroll() {
     const treeT = easeOutCubic(Math.min(Math.max((progress - 0.1) / 0.8, 0), 1))
     const unboundedVh = TREE_MIN_MOBILE + (TREE_MAX_MOBILE - TREE_MIN_MOBILE) * treeT
     treeVh = Math.min(unboundedVh, capVh)
-    treeOffset = TREE_OFFSET_START_MOBILE * (1 - treeT)
+    treeOffset = TREE_OFFSET_START_MOBILE + (TREE_OFFSET_END_MOBILE - TREE_OFFSET_START_MOBILE) * treeT
   } else {
     // Desktop: existing growth behavior
     const unboundedVh = TREE_MIN + (TREE_MAX - TREE_MIN) * eased
