@@ -120,12 +120,9 @@ function onScroll() {
   cloudsEl.style.opacity = String(cloudFade)
   cloudsEl.style.transform = `translateY(${cloudShift}px)`
 
-  // App icons: fade in with tree growth, no interaction until fully grown
-  const iconsInteractable = growthT >= 1
-  appIcons.forEach(icon => {
-    icon.style.opacity = String(eased)
-    icon.style.pointerEvents = iconsInteractable ? 'auto' : 'none'
-  })
+  // Scale app info label with tree growth (1x → 1.4x)
+  const infoScale = 1 + 0.4 * eased
+  appInfo.style.transform = `translateX(-50%) scale(${infoScale})`
 
   // ── Phase 2: Highlight apps sequentially via scroll ──
   if (!isHovering) {
