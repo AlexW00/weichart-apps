@@ -179,9 +179,7 @@ body {
   z-index: 4;
   /* Center the icon on its position point */
   transform: translate(-50%, -50%);
-  /* Hidden until tree grows; JS drives opacity + pointer-events */
-  opacity: 0;
-  pointer-events: none;
+  opacity: 1;
 }
 
 .app-icon img {
@@ -199,7 +197,7 @@ body {
   left: 30%;
 }
 .app-icon[data-index="1"] {
-  top: 37%;
+  top: 42%;
   left: 50%;
 }
 .app-icon[data-index="2"] {
@@ -217,7 +215,7 @@ body {
 /* ── App info label (shown on hover/scroll highlight) ── */
 #app-info {
   position: absolute;
-  top: 20%;
+  top: 23.5%;
   left: 50%;
   transform: translateX(-50%);
   text-align: center;
