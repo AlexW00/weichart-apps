@@ -80,9 +80,6 @@ const MOBILE_TITLE_LAYOUT_MAX_WIDTH = 600
 /** Same breakpoint as @media (max-width: 768px) for #screenshot-bg. Extra tree scale-from-scroll only here. */
 const NARROW_NO_LANES_MAX_WIDTH = 768
 
-/** At full scroll, tree scale is 1 + this (narrow). Wide layouts stay at 1.0 for the screenshot strips. */
-const TREE_GROW_EASED_MAX = 0.14
-
 /** Mobile tree constants — smaller start, width-capped growth, no extra scale. */
 const TREE_MIN_MOBILE = 35
 const TREE_MAX_MOBILE = 55  // usually capped by viewport-width constraint
