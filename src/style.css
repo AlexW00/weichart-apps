@@ -177,6 +177,11 @@ body {
   opacity: 1;
 }
 
+/* Pause lane animations when the group is invisible — saves GPU/CPU */
+.screenshot-group:not(.active) .ss-lane__strip {
+  animation-play-state: paused;
+}
+
 /* Vertical lane — sits on left or right edge */
 .ss-lane {
   position: absolute;
@@ -321,7 +326,11 @@ body {
   }
 
   #tree-container {
-    height: 35vh;
+    height: min(55vh, calc((100vw - 40px) * 827 / 793));
+  }
+
+  #screenshot-bg {
+    top: 28vh;
   }
 }
 
@@ -331,10 +340,12 @@ body {
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  height: 75vh;
+  /* Fixed at max size; JS drives growth via transform: scale() (compositor-only, no layout) */
+  height: min(105vh, calc((100vw - 24px) * 827 / 793));
   aspect-ratio: 793 / 827;
   z-index: 3;
-  will-change: height;
+  transform-origin: bottom center;
+  will-change: transform;
 }
 
 #tree {

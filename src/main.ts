@@ -64,6 +64,12 @@ appIcons.forEach((icon) => {
 	if (subEl) subEl.textContent = icon.dataset.subtitle ?? "";
 });
 
+// Set icon visibility once (these never change — removed from scroll handler)
+appIcons.forEach((icon) => {
+	icon.style.opacity = "1";
+	icon.style.pointerEvents = "auto";
+});
+
 // Tree sizing (vh units) — must match #tree-container aspect-ratio in CSS
 const TREE_MIN = 75;
 const TREE_MAX = 105; // slightly over viewport so trunk base is below fold
@@ -86,12 +92,33 @@ const TREE_MAX_MOBILE = 55; // usually capped by viewport-width constraint
 const TREE_OFFSET_START_MOBILE = 6;
 const TREE_OFFSET_END_MOBILE = 1; // trunk base just below viewport
 
-/** Max tree height (px) so width = height * (W/H) does not exceed viewport with margins on each side. */
-function maxTreeHeightPx(): number {
-	const isMobile = window.innerWidth <= NARROW_NO_LANES_MAX_WIDTH;
-	const horizontalMargin = isMobile ? 40 : 24;
-	const maxW = Math.max(0, window.innerWidth - horizontalMargin);
-	return (maxW * TREE_H) / TREE_W;
+// ── Cached viewport dimensions (updated on resize only, read in scroll handler) ──
+let vw = window.innerWidth;
+let vh = window.innerHeight;
+let maxScroll = document.body.scrollHeight - vh;
+let narrow = vw <= NARROW_NO_LANES_MAX_WIDTH;
+let titleMobile = vw <= MOBILE_TITLE_LAYOUT_MAX_WIDTH;
+
+/** Container's CSS-computed max height in vh (mirrors CSS min() for scale math). */
+let containerVh = computeContainerVh();
+
+function computeContainerVh(): number {
+	const isNarrow = vw <= NARROW_NO_LANES_MAX_WIDTH;
+	const maxVh = isNarrow ? TREE_MAX_MOBILE : TREE_MAX;
+	const margin = isNarrow ? 40 : 24;
+	const maxW = Math.max(0, vw - margin);
+	const capPx = (maxW * TREE_H) / TREE_W;
+	const capVh = (capPx / vh) * 100;
+	return Math.min(maxVh, capVh);
+}
+
+function updateCachedDimensions() {
+	vw = window.innerWidth;
+	vh = window.innerHeight;
+	maxScroll = document.body.scrollHeight - vh;
+	narrow = vw <= NARROW_NO_LANES_MAX_WIDTH;
+	titleMobile = vw <= MOBILE_TITLE_LAYOUT_MAX_WIDTH;
+	containerVh = computeContainerVh();
 }
 
 const screenshotGroups =
@@ -126,7 +153,7 @@ function tileCloudStrip() {
 	if (cloudStripUnitHtml === null) {
 		cloudStripUnitHtml = cloudStrip.innerHTML.trim();
 	}
-	const minWidth = Math.ceil(window.innerWidth * 1.25);
+	const minWidth = Math.ceil(vw * 1.25);
 	cloudStrip.innerHTML = cloudStripUnitHtml;
 	// Before images have dimensions, scrollWidth can be 0 — add one duplicate and retry on load/resize.
 	if (cloudStrip.scrollWidth < 1) {
@@ -170,53 +197,44 @@ function kickCloudMarquee() {
 // True while scroll has fully faded the cloud layer (enables one restart when they reappear)
 let cloudLayerFullyFaded = false;
 
-function onScroll() {
-	const maxScroll = document.body.scrollHeight - window.innerHeight;
+function updateScene() {
 	const progress = maxScroll > 0 ? Math.min(window.scrollY / maxScroll, 1) : 0;
 
 	// Scroll 0→1 = tree grows to full size (page height matches this range only)
 	const eased = easeOutCubic(progress);
 
-	const capPx = maxTreeHeightPx();
-	const capVh = (capPx / window.innerHeight) * 100;
-	const narrow = window.innerWidth <= NARROW_NO_LANES_MAX_WIDTH;
-
 	let treeVh: number;
 	let treeOffset: number;
 
 	if (narrow) {
-		// Mobile: tree, screenshots, and focus effects all use progress 0.1→0.9 so they end together
+		// Mobile: tree, screenshots, and focus effects all use progress 0.1→0.5 so they end together
 		const treeT = easeOutCubic(
 			Math.min(Math.max((progress - 0.1) / 0.4, 0), 1),
 		);
-		const unboundedVh =
-			TREE_MIN_MOBILE + (TREE_MAX_MOBILE - TREE_MIN_MOBILE) * treeT;
-		treeVh = Math.min(unboundedVh, capVh);
+		treeVh = Math.min(
+			TREE_MIN_MOBILE + (TREE_MAX_MOBILE - TREE_MIN_MOBILE) * treeT,
+			containerVh,
+		);
 		treeOffset =
 			TREE_OFFSET_START_MOBILE +
 			(TREE_OFFSET_END_MOBILE - TREE_OFFSET_START_MOBILE) * treeT;
 	} else {
 		// Desktop: existing growth behavior
-		const unboundedVh = TREE_MIN + (TREE_MAX - TREE_MIN) * eased;
-		treeVh = Math.min(unboundedVh, capVh);
+		treeVh = Math.min(TREE_MIN + (TREE_MAX - TREE_MIN) * eased, containerVh);
 		treeOffset =
 			TREE_OFFSET_START + (TREE_OFFSET_END - TREE_OFFSET_START) * eased;
 	}
 
-	treeContainer.style.height = `${treeVh}vh`;
-	treeContainer.style.bottom = `${-treeOffset}vh`;
-	treeContainer.style.transform = "translateX(-50%)";
-	if (narrow) {
-		treeContainer.style.removeProperty("transform-origin");
-	}
+	// Tree: compositor-only transform (no layout-triggering height/bottom changes)
+	const scale = containerVh > 0 ? treeVh / containerVh : 1;
+	treeContainer.style.transform = `translateX(-50%) translateY(${treeOffset}vh) scale(${scale})`;
 
 	// Title: same motion + fade on every layout (driven by scroll, not by sky)
-	const parallaxMult = window.innerWidth < 640 ? 0.45 : 1;
+	const parallaxMult = vw < 640 ? 0.45 : 1;
 	const titleFade = Math.max(1 - eased * 2.5, 0);
 	const titleScale = Math.max(1 - eased * 0.7, 0.3);
 	const titleShift = -eased * 280 * parallaxMult;
 	titleEl.style.opacity = String(titleFade);
-	const titleMobile = window.innerWidth <= MOBILE_TITLE_LAYOUT_MAX_WIDTH;
 	const titleTranslateY = titleMobile
 		? `calc(-50% + ${titleShift}px)`
 		: `${titleShift}px`;
@@ -248,11 +266,9 @@ function onScroll() {
 		skyGradient.style.opacity = "1";
 		skyGradient.style.transform = "translateY(0)";
 
-		// Position screenshot lanes in the gap between sky and tree
+		// Screenshot gap between sky and tree (top is fixed at 28vh via CSS)
 		const treeTopVh = 100 + treeOffset - treeVh;
-		const skyBottomVh = 28;
-		const gapVh = treeTopVh - skyBottomVh;
-		screenshotBg.style.top = `${skyBottomVh}vh`;
+		const gapVh = treeTopVh - 28;
 		screenshotBg.style.height = `${gapVh}vh`;
 		screenshotBg.style.removeProperty("--ss-top-fade");
 		screenshotBg.style.removeProperty("--ss-top-solid");
@@ -290,12 +306,6 @@ function onScroll() {
 		screenshotBg.style.setProperty("--ss-top-fade", `${topFade}%`);
 		screenshotBg.style.setProperty("--ss-top-solid", `${topSolid}%`);
 	}
-
-	// App icons: visible and interactive from the first paint
-	appIcons.forEach((icon) => {
-		icon.style.opacity = "1";
-		icon.style.pointerEvents = "auto";
-	});
 }
 
 // ── Always-selected app: one app is always highlighted, can switch but not deselect ──
@@ -349,7 +359,22 @@ if (touchToggle) {
 setAppHighlight(selectedAppIndex);
 
 // ── Init ──
-window.addEventListener("scroll", onScroll, { passive: true });
+// rAF-gated scroll: at most one scene update per animation frame
+let scrollTicking = false;
+window.addEventListener(
+	"scroll",
+	() => {
+		if (!scrollTicking) {
+			scrollTicking = true;
+			requestAnimationFrame(() => {
+				updateScene();
+				scrollTicking = false;
+			});
+		}
+	},
+	{ passive: true },
+);
+
 document.addEventListener("visibilitychange", () => {
 	if (document.visibilityState === "visible") {
 		kickCloudMarquee();
@@ -368,8 +393,9 @@ window.addEventListener("resize", () => {
 	}
 	resizeDebounce = window.setTimeout(() => {
 		resizeDebounce = null;
+		updateCachedDimensions();
 		tileCloudStrip();
-		onScroll();
+		updateScene();
 	}, 150);
 });
 
@@ -377,4 +403,4 @@ tileCloudStrip();
 window.addEventListener("load", () => {
 	tileCloudStrip();
 });
-onScroll();
+updateScene();
