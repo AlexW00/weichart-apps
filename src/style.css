@@ -201,7 +201,7 @@ body {
       transparent var(--ss-top-fade, 50%),
       black var(--ss-top-solid, 60%),
       black 82%, transparent 100%),
-    linear-gradient(to left, transparent 0%, black 25%, black 100%);
+    linear-gradient(to left, transparent 0%, black 40%, black 100%);
   -webkit-mask-composite: destination-in;
   mask-image:
     linear-gradient(to bottom,
@@ -209,7 +209,7 @@ body {
       transparent var(--ss-top-fade, 50%),
       black var(--ss-top-solid, 60%),
       black 82%, transparent 100%),
-    linear-gradient(to left, transparent 0%, black 25%, black 100%);
+    linear-gradient(to left, transparent 0%, black 40%, black 100%);
   mask-composite: intersect;
 }
 
@@ -221,7 +221,7 @@ body {
       transparent var(--ss-top-fade, 50%),
       black var(--ss-top-solid, 60%),
       black 82%, transparent 100%),
-    linear-gradient(to right, transparent 0%, black 25%, black 100%);
+    linear-gradient(to right, transparent 0%, black 40%, black 100%);
   -webkit-mask-composite: destination-in;
   mask-image:
     linear-gradient(to bottom,
@@ -229,7 +229,7 @@ body {
       transparent var(--ss-top-fade, 50%),
       black var(--ss-top-solid, 60%),
       black 82%, transparent 100%),
-    linear-gradient(to right, transparent 0%, black 25%, black 100%);
+    linear-gradient(to right, transparent 0%, black 40%, black 100%);
   mask-composite: intersect;
 }
 
@@ -298,17 +298,21 @@ body {
 
   .ss-lane--left {
     left: auto;
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%);
+    transform: perspective(500px) rotateY(8deg);
+    transform-origin: right center;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 30%, black 70%, transparent 100%);
     -webkit-mask-composite: source-over;
-    mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0%, black 30%, black 70%, transparent 100%);
     mask-composite: add;
   }
 
   .ss-lane--right {
     right: auto;
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%);
+    transform: perspective(500px) rotateY(-8deg);
+    transform-origin: left center;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 30%, black 70%, transparent 100%);
     -webkit-mask-composite: source-over;
-    mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0%, black 30%, black 70%, transparent 100%);
     mask-composite: add;
   }
 
@@ -429,16 +433,24 @@ body {
 .app-icon.highlighted .app-tooltip {
   opacity: var(--focus-intensity, 0);
   visibility: visible;
+  pointer-events: auto;
   transform: translate3d(-50%, calc((1 - var(--focus-intensity, 0)) * 6px), 0);
 }
 
-.app-tooltip__name {
+a.app-tooltip__name {
   display: block;
   font-family: 'Instrument Serif', Georgia, serif;
   font-weight: 400;
   font-size: clamp(1.05rem, 2.2vw, 1.35rem);
   color: #1a1a1a;
   line-height: 1.2;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-color: rgba(26, 26, 26, 0.3);
+}
+
+a.app-tooltip__name:hover {
+  text-decoration-color: rgba(26, 26, 26, 0.7);
 }
 
 .app-tooltip__subtitle {
@@ -510,6 +522,32 @@ body {
   .app-tooltip {
     min-width: 8.5rem;
     padding: 0.55rem 0.7rem 0.6rem;
+  }
+
+  /* Bottom icons: tooltip below instead of above */
+  .app-icon[data-index="1"] .app-tooltip,
+  .app-icon[data-index="2"] .app-tooltip {
+    bottom: auto;
+    top: calc(100% + 0.65rem);
+    transform: translate3d(-50%, -6px, 0);
+  }
+
+  .app-icon[data-index="1"] .app-tooltip::after,
+  .app-icon[data-index="2"] .app-tooltip::after {
+    top: auto;
+    bottom: 100%;
+    border-top-color: transparent;
+    border-bottom-color: rgba(255, 255, 252, 0.92);
+    filter: drop-shadow(0 -1px 1px rgba(26, 26, 26, 0.04));
+  }
+
+  .app-icon[data-index="1"]:hover .app-tooltip,
+  .app-icon[data-index="1"].highlighted .app-tooltip,
+  .app-icon[data-index="1"].is-touch-open .app-tooltip,
+  .app-icon[data-index="2"]:hover .app-tooltip,
+  .app-icon[data-index="2"].highlighted .app-tooltip,
+  .app-icon[data-index="2"].is-touch-open .app-tooltip {
+    transform: translate3d(-50%, calc((1 - var(--focus-intensity, 0)) * -6px), 0);
   }
 }
 

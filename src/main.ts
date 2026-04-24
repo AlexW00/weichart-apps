@@ -109,6 +109,7 @@ function setAppHighlight(index: number) {
   screenshotGroups.forEach(g => {
     g.classList.toggle('active', g.dataset.app === String(index))
   })
+
 }
 
 function easeOutCubic(t: number): number {
@@ -292,7 +293,7 @@ appIcons.forEach((icon) => {
   const index = parseInt(icon.dataset.index ?? '-1', 10)
 
   if (!touchToggle) {
-    // Desktop: hover/click selects app permanently (no revert on leave)
+    // Desktop: hover selects app, click opens its URL
     icon.addEventListener('mouseenter', () => {
       selectedAppIndex = index
       setAppHighlight(index)
@@ -301,10 +302,19 @@ appIcons.forEach((icon) => {
       selectedAppIndex = index
       setAppHighlight(index)
     })
+    icon.addEventListener('click', () => {
+      const url = icon.dataset.url
+      if (url) window.open(url, '_blank', 'noopener')
+    })
   } else {
-    // Mobile: tap switches permanent selection + shows tooltip
+    // Mobile: first tap selects + shows tooltip, second tap opens URL
     icon.addEventListener('click', (e) => {
       e.stopPropagation()
+      if (selectedAppIndex === index) {
+        const url = icon.dataset.url
+        if (url) window.open(url, '_blank', 'noopener')
+        return
+      }
       selectedAppIndex = index
       setAppHighlight(index)
       appIcons.forEach(i => i.classList.remove('is-touch-open'))
