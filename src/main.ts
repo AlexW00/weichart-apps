@@ -188,7 +188,7 @@ function onScroll() {
 
   if (narrow) {
     // Mobile: tree, screenshots, and focus effects all use progress 0.1→0.9 so they end together
-    const treeT = easeOutCubic(Math.min(Math.max((progress - 0.1) / 0.8, 0), 1))
+    const treeT = easeOutCubic(Math.min(Math.max((progress - 0.1) / 0.4, 0), 1))
     const unboundedVh = TREE_MIN_MOBILE + (TREE_MAX_MOBILE - TREE_MIN_MOBILE) * treeT
     treeVh = Math.min(unboundedVh, capVh)
     treeOffset = TREE_OFFSET_START_MOBILE + (TREE_OFFSET_END_MOBILE - TREE_OFFSET_START_MOBILE) * treeT
@@ -221,7 +221,7 @@ function onScroll() {
   // Focus intensity: drives tooltip, icon rotation, and screenshot visibility
   // Aligned with tree growth so everything settles together (not before the tree stops)
   const focusIntensity = narrow
-    ? (progress >= 0.9 ? 1 : progress > 0.1 ? (progress - 0.1) / 0.8 : 0)
+    ? (progress >= 0.5 ? 1 : progress > 0.1 ? (progress - 0.1) / 0.4 : 0)
     : (eased >= 0.7 ? 1 : eased > 0.15 ? (eased - 0.15) / 0.55 : 0)
   document.documentElement.style.setProperty('--focus-intensity', String(focusIntensity))
   screenshotBg.style.opacity = String(focusIntensity)
