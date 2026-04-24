@@ -1,1072 +1,515 @@
-/* ===========================
-   Fonts
-   =========================== */
-
+/* ── Fonts ── */
 @font-face {
-	font-family: "Instrument Serif";
-	font-style: normal;
-	font-weight: 400;
-	font-display: swap;
-	src: url("/InstrumentSerif-Regular.ttf") format("truetype");
+  font-family: 'Instrument Serif';
+  src: url('/InstrumentSerif-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Instrument Serif';
+  src: url('/InstrumentSerif-Italic.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
 }
 
-@font-face {
-	font-family: "Instrument Serif";
-	font-style: italic;
-	font-weight: 400;
-	font-display: swap;
-	src: url("/InstrumentSerif-Italic.ttf") format("truetype");
-}
-
-/* ===========================
-   Custom Properties
-   =========================== */
+/* ── Reset & Base ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-	/* Colors */
-	--color-sky: #e1f7ff;
-	--color-page: #fefef4;
-	--color-space: #000000;
-	--color-accent: #808c27;
-	--color-text-light: #000000;
-	--color-text-dark: #ffffff;
-
-	/* Fonts */
-	--font-display: "Instrument Serif", Georgia, serif;
-	--font-body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --sky: #E1F7FF;
+  --ground: #FEFEF4;
+  --humans-color: #808C27;
 }
 
-/* ===========================
-   Reset & Base
-   =========================== */
-
-*,
-*::before,
-*::after {
-	box-sizing: border-box;
-	margin: 0;
-	padding: 0;
+html {
+  overflow-x: hidden;
 }
 
-html,
 body {
-	width: 100%;
-	height: 100%;
-	overflow: hidden;
-	background: var(--color-sky);
-	color: var(--color-text-light);
-	font-family: var(--font-body);
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
+  /* One viewport of scroll: bottom = tree fully grown, no extra scroll after */
+  height: 200vh;
+  background: var(--ground);
+  overflow-x: hidden;
 }
 
-/* ===========================
-   Shared Layers
-   =========================== */
-
-#bg-layer {
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	z-index: 0;
-	background-color: #e1f7ff;
+/* ── Fixed scene fills viewport ── */
+#scene {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
 }
 
-#shared-stars {
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	z-index: 1;
-	pointer-events: none;
-	opacity: 0;
-	display: flex;
-	flex-direction: column;
-	justify-content: space-evenly;
+/* ── Sky gradient at top ── */
+#sky-gradient {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 45vh;
+  background: linear-gradient(to bottom, var(--sky) 0%, var(--ground) 100%);
+  pointer-events: none;
+  z-index: 0;
+  will-change: transform;
 }
 
-#shared-stars .shared-star-row {
-	width: 100%;
-	flex-shrink: 0;
+/* ── Cloud marquee ── */
+#clouds {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 20vh;
+  overflow: hidden;
+  z-index: 1;
+  opacity: 0.55;
 }
 
-#shared-stars .shared-star-row img {
-	width: 100%;
-	height: auto;
-	display: block;
+.cloud-strip {
+  display: flex;
+  align-items: flex-start;
+  gap: 3vw;
+  /* --marquee-copies: how many 12-image units are tiled (set in JS) */
+  animation: marquee 80s linear infinite;
+  backface-visibility: hidden;
+  width: max-content;
 }
 
-#shared-star-blink {
-	position: absolute;
-	top: 6%;
-	right: 8%;
-	width: 92px;
-	height: auto;
-	z-index: 10;
-	pointer-events: none;
+.cloud {
+  height: 7vh;
+  min-height: 35px;
+  width: auto;
+  flex-shrink: 0;
 }
 
-#shared-tree {
-	position: fixed;
-	left: 50%;
-	top: 100%;
-	width: min(var(--tree-width, 42vw), 100vw, var(--tree-max-width, 920px));
-	/* transform managed by GSAP */
-	z-index: 2;
-	overflow: visible;
-	--tree-width: 42vw;
-	--tree-max-width: 920px;
+/* Scatter clouds vertically (repeats for each tiled copy of the 12-image unit) */
+.cloud:nth-child(12n+1)  { transform: translateY(1vh); }
+.cloud:nth-child(12n+2)  { transform: translateY(5vh); }
+.cloud:nth-child(12n+3)  { transform: translateY(0vh); }
+.cloud:nth-child(12n+4)  { transform: translateY(3vh); }
+.cloud:nth-child(12n+5)  { transform: translateY(7vh); }
+.cloud:nth-child(12n+6)  { transform: translateY(1.5vh); }
+.cloud:nth-child(12n+7)  { transform: translateY(6vh); }
+.cloud:nth-child(12n+8)  { transform: translateY(0.5vh); }
+.cloud:nth-child(12n+9)  { transform: translateY(4vh); }
+.cloud:nth-child(12n+10) { transform: translateY(7.5vh); }
+.cloud:nth-child(12n+11) { transform: translateY(2vh); }
+.cloud:nth-child(12n+12) { transform: translateY(6.5vh); }
+
+@keyframes marquee {
+  0% { transform: translate3d(0, 0, 0); }
+  100% {
+    /* One full pattern width per copy so the loop is seamless (default 2 = -50%) */
+    transform: translate3d(calc(-100% / var(--marquee-copies, 2)), 0, 0);
+  }
 }
 
-#shared-tree img {
-	width: 100%;
-	height: auto;
-	display: block;
-	pointer-events: none;
+/* ── Title (desktop layout — subtitle anchored to the right; mobile overrides in media query) ── */
+#title {
+  position: absolute;
+  top: 22vh;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  white-space: nowrap;
+  will-change: opacity, transform;
 }
 
-#shared-thrust {
-	position: absolute;
-	left: 50%;
-	top: 100%;
-	transform: translateX(-50%);
-	width: 160px;
-	opacity: 0;
-	pointer-events: none;
+#title h1 {
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(5rem, 14vw, 12rem);
+  color: #1a1a1a;
+  line-height: 1;
+  letter-spacing: -0.02em;
 }
 
-#shared-thrust img {
-	width: 100%;
-	height: auto;
-	display: block;
+#title .subtitle {
+  position: absolute;
+  left: 85%;
+  bottom: -0.5em;
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-style: italic;
+  font-size: clamp(1rem, 2.5vw, 1.6rem);
+  color: #555;
+  letter-spacing: 0.02em;
+  text-align: left;
 }
 
+#typing-word {
+  color: var(--humans-color);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+#cursor {
+  font-style: normal;
+  color: var(--humans-color);
+  animation: blink 1s step-end infinite;
+  margin-left: 1px;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+/* ── Screenshot barrel lanes ── */
+#screenshot-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.screenshot-group {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.screenshot-group.active {
+  opacity: 1;
+}
+
+/* Vertical lane — sits on left or right edge */
+.ss-lane {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: clamp(160px, 22vw, 320px);
+  overflow: hidden;
+}
+
+/*
+ * --ss-top-fade / --ss-top-solid: set by JS based on scroll.
+ * Two-stop approach: fully transparent up to --ss-top-fade,
+ * then a short ramp to solid at --ss-top-solid.
+ * At page top: transparent until 50%, solid at 60% → sky stays clear.
+ * Scrolled down: transparent until 10%, solid at 18% → screenshots fill height.
+ */
+.ss-lane--left {
+  left: 1vw;
+  -webkit-mask-image:
+    linear-gradient(to bottom,
+      transparent 0%,
+      transparent var(--ss-top-fade, 50%),
+      black var(--ss-top-solid, 60%),
+      black 82%, transparent 100%),
+    linear-gradient(to left, transparent 0%, black 25%, black 100%);
+  -webkit-mask-composite: destination-in;
+  mask-image:
+    linear-gradient(to bottom,
+      transparent 0%,
+      transparent var(--ss-top-fade, 50%),
+      black var(--ss-top-solid, 60%),
+      black 82%, transparent 100%),
+    linear-gradient(to left, transparent 0%, black 25%, black 100%);
+  mask-composite: intersect;
+}
+
+.ss-lane--right {
+  right: 1vw;
+  -webkit-mask-image:
+    linear-gradient(to bottom,
+      transparent 0%,
+      transparent var(--ss-top-fade, 50%),
+      black var(--ss-top-solid, 60%),
+      black 82%, transparent 100%),
+    linear-gradient(to right, transparent 0%, black 25%, black 100%);
+  -webkit-mask-composite: destination-in;
+  mask-image:
+    linear-gradient(to bottom,
+      transparent 0%,
+      transparent var(--ss-top-fade, 50%),
+      black var(--ss-top-solid, 60%),
+      black 82%, transparent 100%),
+    linear-gradient(to right, transparent 0%, black 25%, black 100%);
+  mask-composite: intersect;
+}
+
+/* The scrolling strip — 6 images: 3 originals + 3 duplicates for seamless loop */
+.ss-lane__strip {
+  display: flex;
+  flex-direction: column;
+  gap: 3vh;
+  animation: lane-scroll-up 65s linear infinite;
+}
+
+.ss-lane__strip--reverse {
+  animation: lane-scroll-down 72s linear infinite;
+}
+
+@keyframes lane-scroll-up {
+  0%   { transform: translateY(0); }
+  100% { transform: translateY(-50%); }
+}
+
+@keyframes lane-scroll-down {
+  0%   { transform: translateY(-50%); }
+  100% { transform: translateY(0); }
+}
+
+/* Individual screenshot image */
+.ss {
+  width: 100%;
+  height: auto;
+  flex-shrink: 0;
+  border-radius: 12px;
+  opacity: 0.4;
+  filter: saturate(0.88);
+  user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: none;
+}
+
+/* ── Mobile: two vertical screenshot lanes above tree (shown on app-icon tap) ── */
 @media (max-width: 768px) {
-	#shared-star-blink {
-		width: 60px;
-	}
-
-	#shared-thrust {
-		width: 120px;
-	}
-}
-
-#alex-layer {
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	z-index: 4;
-	pointer-events: none;
-}
-
-/* ===========================
-   Scroll Container
-   =========================== */
-
-#app {
-	width: 100%;
-	height: 100vh;
-	overflow-y: auto;
-	overflow-x: hidden;
-	position: relative;
-	z-index: 3;
-}
-
-/* ===========================
-   Scene Spacers
-   =========================== */
-
-.scene-spacer {
-	position: relative;
-	width: 100%;
-	pointer-events: none;
-}
-
-/* ===========================
-   Fixed Scene Layers
-   =========================== */
-
-#intro-layer {
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	z-index: 5;
-	pointer-events: none;
-}
-
-#apps-layer {
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	z-index: 5;
-	pointer-events: none;
-	visibility: hidden;
-	opacity: 0;
-	--app-icon-size: clamp(86px, 7.4vw, 132px);
-	--app-icon-gap: clamp(18px, 2.2vw, 45px);
-}
-
-#apps-layer .l1-app-icon {
-	pointer-events: auto;
-}
-
-#space-layer {
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	z-index: 5;
-	pointer-events: none;
-	visibility: hidden;
-	opacity: 0;
-}
-
-#space-layer .l3-subscribe,
-#space-layer .l3-input {
-	pointer-events: auto;
-}
-
-/* ===========================
-   Level 0: Intro / Sky
-   =========================== */
-
-#intro-layer {
-	background: transparent;
-}
-
-/* --- Cloud Band --- */
-
-#intro-layer .cloud-band {
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 140px;
-	background: linear-gradient(to bottom, var(--color-sky), var(--color-page));
-	overflow: hidden;
-	pointer-events: none;
-	z-index: 3;
-}
-
-#intro-layer .cloud-row {
-	display: flex;
-	position: absolute;
-	left: 0;
-	top: 0;
-}
-
-#intro-layer .cloud-row-1 {
-	animation: cloud-scroll 35s linear infinite;
-}
-
-#intro-layer .cloud-row-2 {
-	top: 50px;
-	left: 70px;
-	animation: cloud-scroll 38s linear infinite;
-}
-
-#intro-layer .cloud-img {
-	height: 100px;
-	width: auto;
-	display: block;
-	flex-shrink: 0;
-}
-
-@keyframes cloud-scroll {
-	from {
-		transform: translateX(0);
-	}
-	to {
-		transform: translateX(-50%);
-	}
-}
-
-/* --- Branding --- */
-
-#intro-layer .branding {
-	position: absolute;
-	top: 28%;
-	left: 50%;
-	transform: translateX(-50%);
-	display: flex;
-	flex-direction: column;
-	align-items: flex-end;
-	z-index: 5;
-}
-
-#intro-layer .wordmark {
-	font-family: var(--font-display);
-	font-weight: 400;
-	font-size: 120px;
-	line-height: 1;
-	color: black;
-}
-
-#intro-layer .subtitle {
-	font-family: var(--font-display);
-	font-style: italic;
-	font-weight: 400;
-	font-size: 28px;
-	line-height: 1;
-	margin-top: 4px;
-	color: black;
-	white-space: nowrap;
-}
-
-#intro-layer .typed-word {
-	color: var(--color-accent);
-	text-decoration: underline;
-}
-
-#intro-layer .cursor {
-	color: var(--color-accent);
-	animation: cursor-blink 1.06s step-end infinite;
-}
-
-@keyframes cursor-blink {
-	0%,
-	50% {
-		opacity: 1;
-	}
-	50.01%,
-	100% {
-		opacity: 0;
-	}
-}
-
-
-
-/* --- Mobile --- */
-
-@media (max-width: 768px) {
-	#intro-layer .wordmark {
-		font-size: 70px;
-	}
-
-	#intro-layer .subtitle {
-		font-size: 20px;
-	}
-
-	#intro-layer .cloud-band {
-		height: 90px;
-	}
-
-	#intro-layer .cloud-img {
-		height: 70px;
-	}
-
-	#intro-layer .cloud-row-2 {
-		top: 35px;
-		left: 46px;
-	}
-}
-
-/* ===========================
-   App Icons (apps-layer)
-   =========================== */
-
-/* --- Label area --- */
-
-#apps-layer .l1-label {
-	position: absolute;
-	top: 24%;
-	left: 50%;
-	transform: translateX(-50%);
-	text-align: center;
-	opacity: 0;
-	transition: opacity 200ms ease;
-	pointer-events: none;
-	z-index: 4;
-	white-space: nowrap;
-}
-
-#apps-layer .l1-label--visible {
-	opacity: 1;
-}
-
-#apps-layer .l1-label-name {
-	font-family: var(--font-display);
-	font-weight: 400;
-	font-size: 52px;
-	line-height: 1.1;
-	color: black;
-}
-
-#apps-layer .l1-label-desc {
-	font-family: var(--font-display);
-	font-style: italic;
-	font-weight: 400;
-	font-size: 19px;
-	line-height: 1.2;
-	color: black;
-	margin-top: 6px;
-}
-
-/* --- App icons row --- */
-
-#apps-layer .l1-icons-row {
-	position: absolute;
-	top: 35.5%;
-	left: 50%;
-	transform: translateX(-50%);
-	display: flex;
-	gap: var(--app-icon-gap);
-	z-index: 3;
-}
-
-#apps-layer .l1-app-icon {
-	width: var(--app-icon-size);
-	height: var(--app-icon-size);
-	border-radius: 16px;
-	background: white;
-	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
-	display: block;
-	transition: transform 250ms ease, box-shadow 250ms ease;
-	cursor: pointer;
-}
-
-#apps-layer .l1-app-icon--active {
-	transform: scale(1.05) rotate(3deg);
-	box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
-}
-
-@media (hover: hover) {
-	#apps-layer .l1-app-icon:hover {
-		transform: scale(1.05) rotate(3deg);
-		box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
-	}
-}
-
-/* --- Mobile --- */
-
-@media (max-width: 768px) {
-	#apps-layer {
-		--app-icon-size: clamp(74px, 12vw, 104px);
-		--app-icon-gap: clamp(12px, 2.6vw, 24px);
-	}
-
-	#apps-layer .l1-label-name {
-		font-size: 36px;
-	}
-
-	#apps-layer .l1-label-desc {
-		font-size: 16px;
-	}
-}
-
-/* ===========================
-   Alex Watering (alex-layer styles in shared layers above)
-   =========================== */
-
-/* --- Alex composite (shared layer) --- */
-
-#alex-layer .l2-alex {
-	position: absolute;
-	left: 58%;
-	top: 80%;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	z-index: 4;
-}
-
-#alex-layer .l2-head {
-	width: clamp(136px, 12vw, 160px);
-	height: clamp(136px, 12vw, 160px);
-	border-radius: 50%;
-	object-fit: cover;
-	object-position: center 20%;
-	display: block;
-	position: relative;
-	z-index: 2;
-}
-
-#alex-layer .l2-body {
-	width: auto;
-	height: clamp(178px, 15vw, 210px);
-	display: block;
-	margin-top: -4px;
-	position: relative;
-	z-index: 1;
-}
-
-/* --- Watering can --- */
-
-#alex-layer .l2-can-wrap {
-	position: absolute;
-	left: -102px;
-	top: 148px;
-	z-index: 3;
-}
-
-#alex-layer .l2-can {
-	width: clamp(118px, 10vw, 138px);
-	height: auto;
-	display: block;
-	transform-origin: 75% 30%;
-	animation: l2-rock 2s ease-in-out infinite;
-}
-
-@keyframes l2-rock {
-	0%,
-	100% {
-		transform: rotate(-3deg);
-	}
-	50% {
-		transform: rotate(4deg);
-	}
-}
-
-/* --- Water drops --- */
-
-#alex-layer .l2-drops {
-	position: absolute;
-	left: 2px;
-	top: 28px;
-	width: 20px;
-	height: 50px;
-	pointer-events: none;
-}
-
-#alex-layer .l2-drop {
-	position: absolute;
-	width: 5px;
-	height: 5px;
-	border-radius: 50%;
-	background: #5baadb;
-	opacity: 0;
-	animation: l2-drop-fall 1.8s ease-in infinite;
-}
-
-@keyframes l2-drop-fall {
-	0% {
-		opacity: 0;
-		transform: translateY(0);
-	}
-	10% {
-		opacity: 1;
-	}
-	80% {
-		opacity: 0.6;
-	}
-	100% {
-		opacity: 0;
-		transform: translateY(48px);
-	}
-}
-
-/* --- Arrow + "This is Alex" label --- */
-
-#alex-layer .l2-arrow-wrap {
-	position: absolute;
-	right: 22%;
-	top: 60%;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	z-index: 6;
-	animation: l2-float-bob 3.5s ease-in-out infinite;
-}
-
-#alex-layer .l2-arrow-text {
-	font-family: var(--font-display);
-	font-style: italic;
-	font-weight: 400;
-	font-size: clamp(28px, 2.4vw, 34px);
-	color: black;
-	white-space: nowrap;
-	margin-bottom: 2px;
-}
-
-#alex-layer .l2-arrow-img {
-	width: clamp(116px, 10vw, 136px);
-	height: auto;
-	display: block;
-}
-
-@keyframes l2-float-bob {
-	0%,
-	100% {
-		margin-top: 0;
-	}
-	50% {
-		margin-top: -5px;
-	}
-}
-
-/* --- Speech bubble --- */
-
-#alex-layer .l2-bubble-wrap {
-	position: absolute;
-	right: 14%;
-	top: 68%;
-	z-index: 7;
-	animation: l2-float-bob 3.5s ease-in-out infinite;
-}
-
-#alex-layer .l2-bubble-img {
-	width: clamp(360px, 30vw, 430px);
-	height: auto;
-	display: block;
-}
-
-#alex-layer .l2-bubble-text {
-	position: absolute;
-	top: 22%;
-	left: 14%;
-	right: 14%;
-	bottom: 22%;
-	font-family: var(--font-display);
-	font-style: italic;
-	font-weight: 400;
-	font-size: clamp(23px, 1.95vw, 28px);
-	line-height: 1.35;
-	color: black;
-	display: flex;
-	align-items: center;
-	pointer-events: none;
-}
-
-/* --- Mobile --- */
-
-@media (max-width: 768px) {
-	#alex-layer .l2-alex {
-		left: 58%;
-		top: 80%;
-	}
-
-	#alex-layer .l2-head {
-		width: 104px;
-		height: 104px;
-	}
-
-	#alex-layer .l2-body {
-		height: 138px;
-	}
-
-	#alex-layer .l2-can-wrap {
-		left: -74px;
-		top: 96px;
-	}
-
-	#alex-layer .l2-can {
-		width: 94px;
-	}
-
-	#alex-layer .l2-arrow-wrap {
-		right: 20%;
-		top: 60%;
-	}
-
-	#alex-layer .l2-arrow-img {
-		width: 94px;
-	}
-
-	#alex-layer .l2-arrow-text {
-		font-size: 24px;
-	}
-
-	#alex-layer .l2-bubble-wrap {
-		right: 12%;
-		top: 67%;
-	}
-
-	#alex-layer .l2-bubble-img {
-		width: 300px;
-	}
-
-	#alex-layer .l2-bubble-text {
-		font-size: 19px;
-	}
-}
-
-/* ===========================
-   Space / Newsletter (space-layer)
-   =========================== */
-
-/* --- Planet wrap --- */
-
-#space-layer .l3-planet-wrap {
-	position: absolute;
-	bottom: 0;
-	left: 0;
-	width: 100%;
-	z-index: 2;
-}
-
-#space-layer .l3-planet-img {
-	width: 100%;
-	height: auto;
-	display: block;
-	transform: translateY(60%);
-}
-
-/* --- Rocket --- */
-
-#space-layer .l3-rocket {
-	position: absolute;
-	left: 50%;
-	bottom: 38%;
-	transform: translateX(-50%);
-	height: 38vh;
-	width: auto;
-	z-index: 4;
-}
-
-/* --- Gantry --- */
-
-#space-layer .l3-gantry {
-	position: absolute;
-	left: calc(50% - 80px);
-	bottom: 38%;
-	transform: translateX(-100%);
-	height: 30vh;
-	width: auto;
-	z-index: 3;
-}
-
-/* --- Cat --- */
-
-#space-layer .l3-cat {
-	position: absolute;
-	left: calc(50% + 70px);
-	bottom: 37%;
-	width: 100px;
-	height: auto;
-	z-index: 5;
-}
-
-/* --- Email form --- */
-
-#space-layer .l3-form {
-	position: absolute;
-	bottom: 12%;
-	left: 50%;
-	transform: translateX(-50%);
-	display: flex;
-	gap: 8px;
-	z-index: 8;
-	align-items: center;
-}
-
-#space-layer .l3-input {
-	width: 230px;
-	height: 42px;
-	padding: 0 12px;
-	border: 1px solid rgba(255, 255, 255, 0.7);
-	border-radius: 0;
-	background: transparent;
-	color: white;
-	font-family: var(--font-body);
-	font-size: 14px;
-	outline: none;
-	transition: border-color 0.2s ease;
-}
-
-#space-layer .l3-input::placeholder {
-	color: rgba(255, 255, 255, 0.45);
-}
-
-#space-layer .l3-input:focus {
-	border-color: white;
-}
-
-#space-layer .l3-subscribe {
-	width: 110px;
-	height: 42px;
-	border: 1px solid rgba(255, 255, 255, 0.7);
-	border-radius: 0;
-	background: transparent;
-	color: white;
-	font-family: var(--font-body);
-	font-size: 14px;
-	cursor: pointer;
-	transition: background 0.2s ease, border-color 0.2s ease;
-}
-
-#space-layer .l3-subscribe:hover {
-	background: rgba(255, 255, 255, 0.12);
-	border-color: white;
-}
-
-/* --- Mobile --- */
-
-@media (max-width: 768px) {
-	#space-layer .l3-form {
-		flex-direction: column;
-	}
-
-	#space-layer .l3-input {
-		width: 220px;
-	}
-
-	#space-layer .l3-subscribe {
-		width: 220px;
-		min-height: 44px;
-	}
-
-	#space-layer .l3-rocket {
-		height: 20vh;
-	}
-
-	#space-layer .l3-gantry {
-		height: 16vh;
-	}
-
-	#space-layer .l3-cat {
-		width: 65px;
-		left: calc(50% + 35px);
-	}
-
-}
-
-/* ===========================
-   Captcha Overlay
-   =========================== */
-
-#captcha-overlay {
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	background: rgba(0, 0, 0, 0.6);
-	display: none;
-	align-items: center;
-	justify-content: center;
-	z-index: 9999;
-}
-
-#captcha-overlay.open {
-	display: flex;
-}
-
-/* --- Modal frame --- */
-
-.captcha-modal {
-	position: relative;
-	width: 480px;
-	height: 488px;
-	background: url("/capcha.png") center / contain no-repeat;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-}
-
-/* --- Button area --- */
-
-.captcha-btn-wrap {
-	position: absolute;
-	bottom: 60px;
-	left: 50%;
-	transform: translateX(-50%);
-	width: 280px;
-	height: 140px;
-	display: flex;
-	align-items: flex-end;
-	justify-content: center;
-}
-
-.captcha-btn-img {
-	max-width: 100%;
-	height: auto;
-	cursor: pointer;
-	user-select: none;
-}
-
-/* --- Loading text --- */
-
-.captcha-loading {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	width: 100%;
-	height: 100%;
-	color: #333;
-	font-family: var(--font-body);
-	font-size: 18px;
-	font-style: italic;
-	text-align: center;
-}
-
-/* --- Cancel button --- */
-
-.captcha-cancel {
-	position: absolute;
-	bottom: 20px;
-	right: 30px;
-	background: none;
-	border: none;
-	color: #888;
-	font-family: var(--font-body);
-	font-size: 13px;
-	cursor: pointer;
-	text-decoration: underline;
-	padding: 4px 8px;
-}
-
-.captcha-cancel:hover {
-	color: #333;
-}
-
-/* ===========================
-   Countdown
-   =========================== */
-
-.l3-countdown {
-	position: absolute;
-	font-family: var(--font-display);
-	font-size: 120px;
-	color: white;
-	z-index: 20;
-	pointer-events: none;
-	text-shadow: 0 0 40px rgba(255, 255, 255, 0.4);
-}
-
-/* ===========================
-   Rocket Thrust
-   =========================== */
-
-.l3-thrust {
-	position: absolute;
-	left: 50%;
-	bottom: 38%;
-	transform: translateX(-50%) translateY(90%);
-	height: 30vh;
-	width: auto;
-	z-index: 3;
-	transform-origin: top center;
-}
-
-/* ===========================
-   Disabled Form (Post-Launch)
-   =========================== */
-
-#space-layer .l3-form.disabled {
-	opacity: 0.4;
-	pointer-events: none;
-}
-
-/* --- Mobile captcha --- */
-
-@media (max-width: 768px) {
-	.captcha-modal {
-		width: 340px;
-		height: 345px;
-	}
-
-	.captcha-btn-wrap {
-		width: 200px;
-		height: 100px;
-		bottom: 45px;
-	}
-
-	.l3-countdown {
-		font-size: 80px;
-	}
-}
-
-/* ===========================
-   Nav Controls
-   =========================== */
-
-.nav-controls {
-	position: fixed;
-	bottom: 24px;
-	right: 20px;
-	display: flex;
-	flex-direction: column;
-	gap: 8px;
-	z-index: 1000;
-}
-
-.nav-btn {
-	width: 36px;
-	height: 36px;
-	border-radius: 50%;
-	background: rgba(255, 255, 255, 0.15);
-	border: 1.5px solid rgba(255, 255, 255, 0.6);
-	cursor: pointer;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	padding: 0;
-	transition: opacity 0.2s;
-}
-
-.nav-btn:hover {
-	background: rgba(255, 255, 255, 0.3);
-}
-
-.nav-btn.disabled {
-	opacity: 0.25;
-	pointer-events: none;
-}
-
-.nav-btn .chevron {
-	display: block;
-	width: 8px;
-	height: 8px;
-	border-right: 2px solid #fff;
-	border-top: 2px solid #fff;
-}
-
-.nav-btn .chevron.up {
-	transform: rotate(-45deg) translateY(2px);
-}
-
-.nav-btn .chevron.down {
-	transform: rotate(135deg) translateY(-2px);
-}
-
-/* ===========================
-   Focus Styles
-   =========================== */
-
-:focus-visible {
-	outline: 2px solid var(--color-accent);
-	outline-offset: 2px;
+  body {
+    height: 125vh;
+  }
+
+  #screenshot-bg {
+    inset: auto 0;
+    overflow: hidden;
+    /* top and height set by JS based on gap between sky and tree */
+  }
+
+  .screenshot-group {
+    /* Keep base position: absolute + inset: 0 so groups overlap (only .active visible) */
+    display: flex;
+    justify-content: center;
+    gap: 1.5vw;
+    padding: 0 2vw;
+  }
+
+  .ss-lane {
+    position: relative;
+    top: auto;
+    bottom: auto;
+    width: 48%;
+    height: 100%;
+  }
+
+  .ss-lane--left {
+    left: auto;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%);
+    -webkit-mask-composite: source-over;
+    mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%);
+    mask-composite: add;
+  }
+
+  .ss-lane--right {
+    right: auto;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%);
+    -webkit-mask-composite: source-over;
+    mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%);
+    mask-composite: add;
+  }
+
+  .ss {
+    border-radius: 8px;
+  }
+
+  #tree-container {
+    height: 35vh;
+  }
+}
+
+/* ── Tree container ── */
+#tree-container {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 75vh;
+  aspect-ratio: 793 / 827;
+  z-index: 3;
+  will-change: height;
+}
+
+#tree {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+
+/* ── App icons inside tree ── */
+.app-icon {
+  position: absolute;
+  width: 9%;
+  cursor: pointer;
+  transition: transform 0.3s ease, z-index 0s linear 0.15s;
+  z-index: 4;
+  /* Center the icon on its position point */
+  transform: translate(-50%, -50%);
+  opacity: 1;
+}
+
+.app-icon:hover {
+  z-index: 8;
+  transition: transform 0.3s ease, z-index 0s;
+}
+
+.app-icon img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 18%;
+}
+
+/* Triangle layout within canopy: apex (top), left base, right base */
+.app-icon[data-index="0"] {
+  top: 28%;
+  left: 50%;
+}
+.app-icon[data-index="1"] {
+  top: 40%;
+  left: 32%;
+}
+.app-icon[data-index="2"] {
+  top: 40%;
+  left: 68%;
+}
+
+/* Hover / highlighted state — scale + rotation driven by --focus-intensity (set by JS on scroll) */
+.app-icon:hover,
+.app-icon.highlighted {
+  transform: translate(-50%, -50%) scale(calc(1 + 0.12 * var(--focus-intensity, 0))) rotate(calc(var(--focus-intensity, 0) * -3deg));
+}
+
+/* ── Hover tooltip ── */
+.app-tooltip {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 0.65rem);
+  transform: translate3d(-50%, 6px, 0);
+  min-width: 10rem;
+  max-width: min(16rem, 70vw);
+  padding: 0.65rem 0.85rem 0.7rem;
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.22s ease,
+    transform 0.22s ease,
+    visibility 0.22s;
+  border-radius: 12px;
+  background: rgba(255, 255, 252, 0.92);
+  border: 1px solid rgba(26, 26, 26, 0.08);
+  box-shadow:
+    0 4px 24px rgba(26, 26, 26, 0.12),
+    0 1px 3px rgba(26, 26, 26, 0.06);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 1;
+}
+
+.app-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -7px;
+  border: 7px solid transparent;
+  border-top-color: rgba(255, 255, 252, 0.92);
+  filter: drop-shadow(0 2px 1px rgba(26, 26, 26, 0.06));
+}
+
+.app-icon:hover .app-tooltip,
+.app-icon:focus-visible .app-tooltip,
+.app-icon.is-touch-open .app-tooltip,
+.app-icon.highlighted .app-tooltip {
+  opacity: var(--focus-intensity, 0);
+  visibility: visible;
+  transform: translate3d(-50%, calc((1 - var(--focus-intensity, 0)) * 6px), 0);
+}
+
+.app-tooltip__name {
+  display: block;
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(1.05rem, 2.2vw, 1.35rem);
+  color: #1a1a1a;
+  line-height: 1.2;
+}
+
+.app-tooltip__subtitle {
+  display: block;
+  margin-top: 0.2em;
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-style: italic;
+  font-size: clamp(0.68rem, 1.35vw, 0.88rem);
+  color: #555;
+  line-height: 1.35;
+}
+
+.app-tooltip__subtitle:empty {
+  display: none;
+}
+
+.app-icon:focus {
+  outline: none;
+}
+
+.app-icon:focus-visible {
+  outline: 2px solid var(--humans-color);
+  outline-offset: 4px;
+  border-radius: 22%;
+}
+
+/* ── Mobile only (keeps desktop title + subtitle geometry unchanged) ── */
+@media (max-width: 600px) {
+  #title {
+    /* Anchor the block between sky and tree; JS uses translateY(calc(-50% + …)) to center the box on this line */
+    top: 47%;
+    white-space: normal;
+    max-width: min(100%, calc(100vw - 1.5rem - env(safe-area-inset-left) - env(safe-area-inset-right)));
+    padding-left: max(0.75rem, env(safe-area-inset-left, 0px));
+    padding-right: max(0.75rem, env(safe-area-inset-right, 0px));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  #title h1 {
+    font-size: min(12rem, max(2.4rem, min(16vw, calc((100vw - 1.5rem) / 5.2))));
+    max-width: 100%;
+  }
+
+  #title .subtitle {
+    position: static;
+    left: auto;
+    bottom: auto;
+    margin-top: 0.45em;
+    text-align: center;
+    max-width: min(18rem, 90vw);
+  }
+
+  #clouds {
+    height: 16vh;
+  }
+
+  .cloud {
+    height: 5.5vh;
+    min-height: 28px;
+  }
+
+  .app-icon {
+    width: 9%;
+  }
+
+  .app-tooltip {
+    min-width: 8.5rem;
+    padding: 0.55rem 0.7rem 0.6rem;
+  }
 }
-
-/* ===========================
-   Reduced Motion
-   =========================== */
-
-@media (prefers-reduced-motion: reduce) {
-	#intro-layer .cloud-row-1,
-	#intro-layer .cloud-row-2 {
-		animation: none;
-	}
-
-	#alex-layer .l2-can {
-		animation: none;
-	}
 
-	#alex-layer .l2-drop {
-		animation: none;
-	}
-
-	#alex-layer .l2-arrow-wrap,
-	#alex-layer .l2-bubble-wrap {
-		animation: none;
-	}
-
-	#intro-layer .cursor {
-		animation: none;
-		border-right-color: transparent;
-	}
-
-	#shared-star-blink {
-		opacity: 1;
-	}
-}

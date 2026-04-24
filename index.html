@@ -7,7 +7,147 @@
 		<title>Weichart — Apps for Humans</title>
 	</head>
 	<body>
-		<div id="app"></div>
+		<div id="scene">
+			<!-- Sky gradient (animated via JS) -->
+			<div id="sky-gradient"></div>
+
+			<!-- Cloud marquee -->
+			<div id="clouds">
+				<div class="cloud-strip">
+					<img src="/cloud-colored.png" alt="" class="cloud" />
+					<img src="/cloud-colored.png" alt="" class="cloud" />
+					<img src="/cloud-colored.png" alt="" class="cloud" />
+					<img src="/cloud-colored.png" alt="" class="cloud" />
+					<img src="/cloud-colored.png" alt="" class="cloud" />
+					<img src="/cloud-colored.png" alt="" class="cloud" />
+					<img src="/cloud-colored.png" alt="" class="cloud" />
+					<img src="/cloud-colored.png" alt="" class="cloud" />
+					<img src="/cloud-colored.png" alt="" class="cloud" />
+					<img src="/cloud-colored.png" alt="" class="cloud" />
+					<img src="/cloud-colored.png" alt="" class="cloud" />
+					<img src="/cloud-colored.png" alt="" class="cloud" />
+				</div>
+			</div>
+
+			<!-- Title -->
+			<div id="title">
+				<h1>Weichart</h1>
+				<p class="subtitle">Apps for <span id="typing-word">Humans</span><span id="cursor">|</span></p>
+			</div>
+
+			<!-- Screenshot lanes (vertical barrel scroll, fade in on app hover) -->
+			<div id="screenshot-bg">
+				<div class="screenshot-group" data-app="0">
+					<div class="ss-lane ss-lane--left">
+						<div class="ss-lane__strip">
+							<img class="ss" src="/screenshots/screenshot.png" alt="" />
+							<img class="ss" src="/screenshots/screenshot.png" alt="" />
+							<img class="ss" src="/screenshots/screenshot.png" alt="" />
+							<img class="ss" src="/screenshots/screenshot.png" alt="" />
+							<img class="ss" src="/screenshots/screenshot.png" alt="" />
+							<img class="ss" src="/screenshots/screenshot.png" alt="" />
+						</div>
+					</div>
+					<div class="ss-lane ss-lane--right">
+						<div class="ss-lane__strip ss-lane__strip--reverse">
+							<img class="ss" src="/screenshots/screenshot.png" alt="" />
+							<img class="ss" src="/screenshots/screenshot.png" alt="" />
+							<img class="ss" src="/screenshots/screenshot.png" alt="" />
+							<img class="ss" src="/screenshots/screenshot.png" alt="" />
+							<img class="ss" src="/screenshots/screenshot.png" alt="" />
+							<img class="ss" src="/screenshots/screenshot.png" alt="" />
+						</div>
+					</div>
+				</div>
+
+				<div class="screenshot-group" data-app="1">
+					<div class="ss-lane ss-lane--left">
+						<div class="ss-lane__strip">
+							<img class="ss" src="/screenshots/screenshot.png" alt="" />
+							<img class="ss" src="/screenshots/screenshot.png" alt="" />
+							<img class="ss" src="/screenshots/screenshot.png" alt="" />
+							<img class="ss" src="/screenshots/screenshot.png" alt="" />
+							<img class="ss" src="/screenshots/screenshot.png" alt="" />
+							<img class="ss" src="/screenshots/screenshot.png" alt="" />
+						</div>
+					</div>
+					<div class="ss-lane ss-lane--right">
+						<div class="ss-lane__strip ss-lane__strip--reverse">
+							<img class="ss" src="/screenshots/screenshot.png" alt="" />
+							<img class="ss" src="/screenshots/screenshot.png" alt="" />
+							<img class="ss" src="/screenshots/screenshot.png" alt="" />
+							<img class="ss" src="/screenshots/screenshot.png" alt="" />
+							<img class="ss" src="/screenshots/screenshot.png" alt="" />
+							<img class="ss" src="/screenshots/screenshot.png" alt="" />
+						</div>
+					</div>
+				</div>
+
+				<div class="screenshot-group" data-app="2">
+					<div class="ss-lane ss-lane--left">
+						<div class="ss-lane__strip">
+							<img class="ss" src="/screenshots/screenshot.png" alt="" />
+							<img class="ss" src="/screenshots/screenshot.png" alt="" />
+							<img class="ss" src="/screenshots/screenshot.png" alt="" />
+							<img class="ss" src="/screenshots/screenshot.png" alt="" />
+							<img class="ss" src="/screenshots/screenshot.png" alt="" />
+							<img class="ss" src="/screenshots/screenshot.png" alt="" />
+						</div>
+					</div>
+					<div class="ss-lane ss-lane--right">
+						<div class="ss-lane__strip ss-lane__strip--reverse">
+							<img class="ss" src="/screenshots/screenshot.png" alt="" />
+							<img class="ss" src="/screenshots/screenshot.png" alt="" />
+							<img class="ss" src="/screenshots/screenshot.png" alt="" />
+							<img class="ss" src="/screenshots/screenshot.png" alt="" />
+							<img class="ss" src="/screenshots/screenshot.png" alt="" />
+							<img class="ss" src="/screenshots/screenshot.png" alt="" />
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Tree with apps -->
+			<div id="tree-container">
+				<img id="tree" src="/tree-colored.png" alt="A tree made of code" />
+
+				<!-- App icons (triangle: apex, left base, right base) -->
+				<div
+					class="app-icon"
+					data-index="0"
+					data-name="Zettel"
+					data-subtitle="Minimalist Quick Notes"
+					tabindex="0"
+				>
+					<img src="/zettel-icon.png" alt="Zettel" />
+					<div class="app-tooltip" role="tooltip">
+						<span class="app-tooltip__name">Zettel</span>
+						<span class="app-tooltip__subtitle">Minimalist Quick Notes</span>
+					</div>
+				</div>
+				<div
+					class="app-icon"
+					data-index="1"
+					data-name="Zeitgeist"
+					data-subtitle="Your Time, Organized"
+					tabindex="0"
+				>
+					<img src="/zeitgeist-icon.png" alt="Zeitgeist" />
+					<div class="app-tooltip" role="tooltip">
+						<span class="app-tooltip__name">Zeitgeist</span>
+						<span class="app-tooltip__subtitle">Your Time, Organized</span>
+					</div>
+				</div>
+				<div class="app-icon" data-index="2" data-name="?" data-subtitle="Coming Soon" tabindex="0">
+					<img src="/next-icon.png" alt="Coming soon" />
+					<div class="app-tooltip" role="tooltip">
+						<span class="app-tooltip__name">?</span>
+						<span class="app-tooltip__subtitle">Coming Soon</span>
+					</div>
+				</div>
+			</div>
+		</div>
+
 		<script type="module" src="/src/main.ts"></script>
 	</body>
 </html>
