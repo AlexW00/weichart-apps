@@ -51,6 +51,7 @@ setTimeout(() => {
 const treeContainer = document.getElementById('tree-container')!
 const titleEl = document.getElementById('title')!
 const cloudsEl = document.getElementById('clouds')!
+const skyGradient = document.getElementById('sky-gradient')!
 const appIcons = document.querySelectorAll<HTMLElement>('.app-icon')
 const appInfo = document.getElementById('app-info')!
 const appNameEl = document.getElementById('app-name')!
@@ -107,18 +108,24 @@ function onScroll() {
   treeContainer.style.height = `${treeVh}vh`
   treeContainer.style.bottom = `${-treeOffset}vh`
 
-  // Title: shrinks and rises up as user scrolls down, fades out quickly
-  const titleFade = Math.max(1 - growthT * 3.5, 0)
-  const titleScale = Math.max(1 - growthT * 2, 0.3)
-  const titleShift = -growthT * 150 // moves up
+  // Title: shrinks and rises, fading into the distance (uses eased timing to stay ahead of tree)
+  const titleFade = Math.max(1 - eased * 2.5, 0)
+  const titleScale = Math.max(1 - eased * 0.7, 0.3)
+  const titleShift = -eased * 280
   titleEl.style.opacity = String(titleFade)
   titleEl.style.transform = `translateX(-50%) translateY(${titleShift}px) scale(${titleScale})`
 
   // Clouds: fade and rise with tree
-  const cloudFade = Math.max(0.55 - growthT * 1.4, 0)
-  const cloudShift = -growthT * 80
+  const cloudFade = Math.max(0.55 - eased * 1.0, 0)
+  const cloudShift = -eased * 200
   cloudsEl.style.opacity = String(cloudFade)
   cloudsEl.style.transform = `translateY(${cloudShift}px)`
+
+  // Sky gradient: fades out and rises, fully gone when tree is full size
+  const gradientFade = Math.max(1 - eased, 0)
+  const gradientShift = -eased * 160
+  skyGradient.style.opacity = String(gradientFade)
+  skyGradient.style.transform = `translateY(${gradientShift}px)`
 
   // App icons: fade in with tree growth, no interaction until fully grown
   const iconsInteractable = growthT >= 1

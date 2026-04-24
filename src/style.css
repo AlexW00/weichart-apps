@@ -44,8 +44,7 @@ body {
 }
 
 /* ── Sky gradient at top ── */
-#scene::before {
-  content: '';
+#sky-gradient {
   position: absolute;
   top: 0;
   left: 0;
@@ -54,6 +53,7 @@ body {
   background: linear-gradient(to bottom, var(--sky) 0%, var(--ground) 100%);
   pointer-events: none;
   z-index: 0;
+  will-change: transform;
 }
 
 /* ── Cloud marquee ── */
