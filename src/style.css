@@ -158,6 +158,123 @@ body {
   51%, 100% { opacity: 0; }
 }
 
+/* ── Screenshot barrel lanes ── */
+#screenshot-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.screenshot-group {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.screenshot-group.active {
+  opacity: 1;
+}
+
+/* Vertical lane — sits on left or right edge */
+.ss-lane {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: clamp(160px, 22vw, 320px);
+  overflow: hidden;
+}
+
+/*
+ * --ss-top-fade / --ss-top-solid: set by JS based on scroll.
+ * Two-stop approach: fully transparent up to --ss-top-fade,
+ * then a short ramp to solid at --ss-top-solid.
+ * At page top: transparent until 50%, solid at 60% → sky stays clear.
+ * Scrolled down: transparent until 10%, solid at 18% → screenshots fill height.
+ */
+.ss-lane--left {
+  left: 1vw;
+  -webkit-mask-image:
+    linear-gradient(to bottom,
+      transparent 0%,
+      transparent var(--ss-top-fade, 50%),
+      black var(--ss-top-solid, 60%),
+      black 82%, transparent 100%),
+    linear-gradient(to left, transparent 0%, black 25%, black 100%);
+  -webkit-mask-composite: destination-in;
+  mask-image:
+    linear-gradient(to bottom,
+      transparent 0%,
+      transparent var(--ss-top-fade, 50%),
+      black var(--ss-top-solid, 60%),
+      black 82%, transparent 100%),
+    linear-gradient(to left, transparent 0%, black 25%, black 100%);
+  mask-composite: intersect;
+}
+
+.ss-lane--right {
+  right: 1vw;
+  -webkit-mask-image:
+    linear-gradient(to bottom,
+      transparent 0%,
+      transparent var(--ss-top-fade, 50%),
+      black var(--ss-top-solid, 60%),
+      black 82%, transparent 100%),
+    linear-gradient(to right, transparent 0%, black 25%, black 100%);
+  -webkit-mask-composite: destination-in;
+  mask-image:
+    linear-gradient(to bottom,
+      transparent 0%,
+      transparent var(--ss-top-fade, 50%),
+      black var(--ss-top-solid, 60%),
+      black 82%, transparent 100%),
+    linear-gradient(to right, transparent 0%, black 25%, black 100%);
+  mask-composite: intersect;
+}
+
+/* The scrolling strip — 6 images: 3 originals + 3 duplicates for seamless loop */
+.ss-lane__strip {
+  display: flex;
+  flex-direction: column;
+  gap: 3vh;
+  animation: lane-scroll-up 45s linear infinite;
+}
+
+.ss-lane__strip--reverse {
+  animation: lane-scroll-down 50s linear infinite;
+}
+
+@keyframes lane-scroll-up {
+  0%   { transform: translateY(0); }
+  100% { transform: translateY(-50%); }
+}
+
+@keyframes lane-scroll-down {
+  0%   { transform: translateY(-50%); }
+  100% { transform: translateY(0); }
+}
+
+/* Individual screenshot image */
+.ss {
+  width: 100%;
+  height: auto;
+  flex-shrink: 0;
+  border-radius: 12px;
+  opacity: 0.4;
+  filter: saturate(0.88);
+  user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: none;
+}
+
+/* Hide on mobile (no hover) */
+@media (max-width: 600px) {
+  #screenshot-bg {
+    display: none;
+  }
+}
+
 /* ── Tree container ── */
 #tree-container {
   position: absolute;

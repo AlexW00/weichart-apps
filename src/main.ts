@@ -52,6 +52,7 @@ const treeContainer = document.getElementById('tree-container')!
 const titleEl = document.getElementById('title')!
 const cloudsEl = document.getElementById('clouds')!
 const skyGradient = document.getElementById('sky-gradient')!
+const screenshotBg = document.getElementById('screenshot-bg')!
 const appIcons = document.querySelectorAll<HTMLElement>('.app-icon')
 
 appIcons.forEach((icon) => {
@@ -71,14 +72,20 @@ const TREE_MAX = 105 // slightly over viewport so trunk base is below fold
 const TREE_OFFSET_START = 20 // vh below viewport bottom
 const TREE_OFFSET_END = 0   // fully in frame at end of growth
 
+const screenshotGroups = document.querySelectorAll<HTMLElement>('.screenshot-group')
+
 function setAppHighlight(index: number) {
   if (index < 0 || index >= appIcons.length) {
     appIcons.forEach(icon => icon.classList.remove('highlighted'))
+    screenshotGroups.forEach(g => g.classList.remove('active'))
     return
   }
 
   appIcons.forEach((ic, i) => {
     ic.classList.toggle('highlighted', i === index)
+  })
+  screenshotGroups.forEach(g => {
+    g.classList.toggle('active', g.dataset.app === String(index))
   })
 }
 
@@ -179,6 +186,15 @@ function onScroll() {
   const gradientShift = -eased * 160
   skyGradient.style.opacity = String(gradientFade)
   skyGradient.style.transform = `translateY(${gradientShift}px)`
+
+  // Screenshot lanes: keep them below the sky.
+  // Two-stop mask: fully transparent until topFade, then ramp to solid at topSolid.
+  // At top (eased≈0) → transparent until 50%, solid at 60%
+  // At bottom (eased≈1) → transparent until 10%, solid at 18%
+  const topFade = 50 - 40 * eased
+  const topSolid = topFade + 10
+  screenshotBg.style.setProperty('--ss-top-fade', `${topFade}%`)
+  screenshotBg.style.setProperty('--ss-top-solid', `${topSolid}%`)
 
   // App icons: visible and interactive from the first paint
   appIcons.forEach(icon => {
