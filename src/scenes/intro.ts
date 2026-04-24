@@ -3,7 +3,7 @@
 import { gsap } from "gsap";
 import type { Scene } from "../story-controller";
 
-const WORDS = ["Humans", "Menschen", "人間"];
+const WORDS = ["Humans", "Menschen", "人間", "Cats?"];
 const DELETE_SPEED = 40;
 const TYPE_SPEED = 60;
 const HOLD_DURATION = 4000;
