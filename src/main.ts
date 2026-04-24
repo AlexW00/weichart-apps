@@ -134,6 +134,10 @@ function onScroll() {
     icon.style.pointerEvents = iconsInteractable ? 'auto' : 'none'
   })
 
+  // Scale app info label with tree growth (1x → 1.4x)
+  const infoScale = 1 + 0.4 * eased
+  appInfo.style.transform = `translateX(-50%) scale(${infoScale})`
+
   // ── Phase 2: Highlight apps sequentially via scroll ──
   if (!isHovering) {
     if (progress > GROWTH_END) {
