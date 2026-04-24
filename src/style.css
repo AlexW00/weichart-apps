@@ -271,7 +271,7 @@ body {
 /* ── Mobile: two vertical screenshot lanes above tree (shown on app-icon tap) ── */
 @media (max-width: 768px) {
   body {
-    height: 125vh;
+    height: 200vh;
   }
 
   #screenshot-bg {
