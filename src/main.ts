@@ -71,23 +71,15 @@ const TREE_MAX = 105 // slightly over viewport so trunk base is below fold
 const TREE_OFFSET_START = 20 // vh below viewport bottom
 const TREE_OFFSET_END = 0   // fully in frame at end of growth
 
-// Phase split: 0→0.55 = tree growth, 0.55→1.0 = app highlights
-const GROWTH_END = 0.55
-
-let currentHighlight = -1
-let isHovering = false
-
 function setAppHighlight(index: number) {
   if (index < 0 || index >= appIcons.length) {
     appIcons.forEach(icon => icon.classList.remove('highlighted'))
-    currentHighlight = -1
     return
   }
 
   appIcons.forEach((ic, i) => {
     ic.classList.toggle('highlighted', i === index)
   })
-  currentHighlight = index
 }
 
 function easeOutCubic(t: number): number {
@@ -153,9 +145,8 @@ function onScroll() {
   const progress =
     maxScroll > 0 ? Math.min(window.scrollY / maxScroll, 1) : 0
 
-  // ── Phase 1: Tree growth + title/cloud fade ──
-  const growthT = Math.min(progress / GROWTH_END, 1)
-  const eased = easeOutCubic(growthT)
+  // Scroll 0→1 = tree grows to full size (page height matches this range only)
+  const eased = easeOutCubic(progress)
 
   // Tree height + vertical offset (starts pushed down, scrolls into frame)
   const treeVh = TREE_MIN + (TREE_MAX - TREE_MIN) * eased
@@ -170,7 +161,7 @@ function onScroll() {
   titleEl.style.opacity = String(titleFade)
   titleEl.style.transform = `translateX(-50%) translateY(${titleShift}px) scale(${titleScale})`
 
-  // Clouds: fade and rise with tree (0.55 → 0 across full growth phase, not by eased≈0.55)
+  // Clouds: fade and rise with tree
   const cloudFade = Math.max(0.55 * (1 - eased), 0)
   const cloudShift = -eased * 200
   cloudsEl.style.opacity = String(cloudFade)
@@ -194,39 +185,23 @@ function onScroll() {
     icon.style.opacity = '1'
     icon.style.pointerEvents = 'auto'
   })
-
-  // ── Phase 2: Highlight apps sequentially via scroll ──
-  if (!isHovering) {
-    if (progress > GROWTH_END) {
-      const hlT = (progress - GROWTH_END) / (1 - GROWTH_END)
-      const count = appIcons.length
-      const idx = Math.min(Math.floor(hlT * count), count - 1)
-      if (idx !== currentHighlight) setAppHighlight(idx)
-    } else {
-      setAppHighlight(-1)
-    }
-  }
 }
 
-// ── Hover / keyboard focus (pause scroll-driven highlight) ──
+// ── Hover / keyboard focus ──
 appIcons.forEach((icon) => {
   const index = parseInt(icon.dataset.index ?? '-1', 10)
 
   icon.addEventListener('mouseenter', () => {
-    isHovering = true
     setAppHighlight(index)
   })
   icon.addEventListener('mouseleave', () => {
-    isHovering = false
-    onScroll()
+    setAppHighlight(-1)
   })
   icon.addEventListener('focus', () => {
-    isHovering = true
     setAppHighlight(index)
   })
   icon.addEventListener('blur', () => {
-    isHovering = false
-    onScroll()
+    setAppHighlight(-1)
   })
 })
 

@@ -28,7 +28,8 @@ html {
 }
 
 body {
-  height: 350vh;
+  /* One viewport of scroll: bottom = tree fully grown, no extra scroll after */
+  height: 200vh;
   background: var(--ground);
   overflow-x: hidden;
 }
@@ -201,15 +202,15 @@ body {
 
 /* Triangle layout within canopy: apex (top), left base, right base */
 .app-icon[data-index="0"] {
-  top: 34%;
+  top: 28%;
   left: 50%;
 }
 .app-icon[data-index="1"] {
-  top: 52%;
+  top: 40%;
   left: 32%;
 }
 .app-icon[data-index="2"] {
-  top: 52%;
+  top: 40%;
   left: 68%;
 }
 
