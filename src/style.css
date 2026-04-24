@@ -382,10 +382,15 @@ body {
   left: 68%;
 }
 
-/* Hover / highlighted state — scale + rotation driven by --focus-intensity (set by JS on scroll) */
-.app-icon:hover,
+/* Highlighted state — scale + rotation driven by --focus-intensity (set by JS on scroll) */
 .app-icon.highlighted {
   transform: translate(-50%, -50%) scale(calc(1 + 0.12 * var(--focus-intensity, 0))) rotate(calc(var(--focus-intensity, 0) * -3deg));
+}
+
+@media (hover: hover) {
+  .app-icon:hover {
+    transform: translate(-50%, -50%) scale(calc(1 + 0.12 * var(--focus-intensity, 0))) rotate(calc(var(--focus-intensity, 0) * -3deg));
+  }
 }
 
 /* ── Hover tooltip ── */
@@ -427,7 +432,6 @@ body {
   filter: drop-shadow(0 2px 1px rgba(26, 26, 26, 0.06));
 }
 
-.app-icon:hover .app-tooltip,
 .app-icon:focus-visible .app-tooltip,
 .app-icon.is-touch-open .app-tooltip,
 .app-icon.highlighted .app-tooltip {
@@ -435,6 +439,16 @@ body {
   visibility: visible;
   pointer-events: auto;
   transform: translate3d(-50%, calc((1 - var(--focus-intensity, 0)) * 6px), 0);
+}
+
+/* :hover only on devices with a real pointer — prevents iOS sticky hover */
+@media (hover: hover) {
+  .app-icon:hover .app-tooltip {
+    opacity: var(--focus-intensity, 0);
+    visibility: visible;
+    pointer-events: auto;
+    transform: translate3d(-50%, calc((1 - var(--focus-intensity, 0)) * 6px), 0);
+  }
 }
 
 a.app-tooltip__name {
