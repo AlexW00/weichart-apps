@@ -73,14 +73,14 @@ appIcons.forEach((icon) => {
 });
 
 // Tree sizing (vh units) — must match #tree-container aspect-ratio in CSS
-const TREE_MIN = 75;
-const TREE_MAX = 105; // slightly over viewport so trunk base is below fold
-const TREE_W = 793;
-const TREE_H = 827;
+const TREE_MIN = 60;
+const TREE_MAX = 90;
+const TREE_W = 513;
+const TREE_H = 693;
 
 // Tree starts pushed down so trunk is cut off at bottom
-const TREE_OFFSET_START = 20; // vh below viewport bottom
-const TREE_OFFSET_END = 5; // trunk base below viewport at end of growth
+const TREE_OFFSET_START = 20;
+const TREE_OFFSET_END = 0;
 
 /** Matches @media (max-width) for #title in style.css (centered block + stacked subtitle). */
 const MOBILE_TITLE_LAYOUT_MAX_WIDTH = 600;
@@ -261,6 +261,20 @@ function updateScene() {
 		String(focusIntensity),
 	);
 	screenshotBg.style.opacity = String(focusIntensity);
+
+	// Alex walks out from behind the tree — starts at eased 0.3, finishes at eased 1.0
+	const alexT = eased > 0.3 ? Math.min((eased - 0.3) / 0.7, 1) : 0;
+	const alexLeft = 50 + alexT * 20;
+	const alexZIndex = alexT >= 1 ? 5 : -1;
+	const wobbleRotate = alexT < 1
+		? Math.sin(alexT * Math.PI * 10) * 5 * (1 - alexT)
+		: 0;
+	const wobbleY = alexT < 1
+		? Math.abs(Math.sin(alexT * Math.PI * 10)) * 6 * (1 - alexT)
+		: 0;
+	alexEl.style.left = `${alexLeft}%`;
+	alexEl.style.zIndex = String(alexZIndex);
+	alexEl.style.transform = `translateY(-${wobbleY}px) rotate(${wobbleRotate}deg)`;
 
 	if (narrow) {
 		// Mobile: sticky sky — no animation, clouds and gradient stay in place
@@ -452,12 +466,7 @@ function launchSequence() {
 		requestAnimationFrame(alexRunLoop);
 	}, 200);
 
-	// Phase 3 (500ms): Thrust appears
-	setTimeout(() => {
-		thrustEl.classList.add("visible");
-	}, 500);
-
-	// Phase 4 (600ms): Screen rumble (rAF-driven, 1.5s)
+	// Phase 3 (600ms): Screen rumble + thrust fades in during rumble
 	setTimeout(() => {
 		const rumbleStart = performance.now();
 		const rumbleDuration = 900;
@@ -466,6 +475,7 @@ function launchSequence() {
 			const elapsed = now - rumbleStart;
 			if (elapsed >= rumbleDuration) {
 				scene.style.transform = "";
+				thrustEl.style.opacity = "1";
 				startLaunch();
 				return;
 			}
@@ -474,6 +484,8 @@ function launchSequence() {
 			const rx = (Math.random() - 0.5) * 2 * amplitude;
 			const ry = (Math.random() - 0.5) * 2 * amplitude;
 			scene.style.transform = `translate(${rx}px, ${ry}px)`;
+			// Fade in thrust during rumble
+			thrustEl.style.opacity = String(progress);
 			requestAnimationFrame(rumbleLoop);
 		}
 		requestAnimationFrame(rumbleLoop);
@@ -539,6 +551,13 @@ function launchSequence() {
 						wipe.style.height = `${size}px`;
 						if (wt >= 1) {
 							window.location.href = alexUrl;
+							// Fallback link if redirect doesn't work
+							setTimeout(() => {
+								const fallback = document.getElementById("fallback-link")!;
+								const link = fallback.querySelector("a")!;
+								link.href = alexUrl;
+								fallback.style.display = "block";
+							}, 1000);
 							return;
 						}
 						requestAnimationFrame(wipeLoop);
@@ -551,6 +570,16 @@ function launchSequence() {
 		}
 		requestAnimationFrame(launchLoop);
 	}
+}
+
+// Intercept clicks on Alex's tooltip link — trigger launch instead of navigating
+const alexTooltipLink = alexEl.querySelector(".app-tooltip__name");
+if (alexTooltipLink) {
+	alexTooltipLink.addEventListener("click", (e) => {
+		e.preventDefault();
+		e.stopPropagation();
+		launchSequence();
+	});
 }
 
 if (!touchToggle) {

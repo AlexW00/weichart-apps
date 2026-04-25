@@ -327,7 +327,7 @@ body {
   }
 
   #tree-container {
-    height: min(55vh, calc((100vw - 40px) * 827 / 793));
+    height: min(55vh, calc((100vw - 40px) * 693 / 513));
   }
 
   #screenshot-bg {
@@ -342,8 +342,8 @@ body {
   left: 50%;
   transform: translateX(-50%);
   /* Fixed at max size; JS drives growth via transform: scale() (compositor-only, no layout) */
-  height: min(105vh, calc((100vw - 24px) * 827 / 793));
-  aspect-ratio: 793 / 827;
+  height: min(90vh, calc((100vw - 24px) * 693 / 513));
+  aspect-ratio: 513 / 693;
   z-index: 3;
   transform-origin: bottom center;
   will-change: transform;
@@ -359,7 +359,7 @@ body {
 /* ── App icons inside tree ── */
 .app-icon {
   position: absolute;
-  width: 9%;
+  width: 14%;
   cursor: pointer;
   transition: transform 0.3s ease, z-index 0s linear 0.15s;
   z-index: 4;
@@ -382,16 +382,16 @@ body {
 
 /* Triangle layout within canopy: apex (top), left base, right base */
 .app-icon[data-index="0"] {
-  top: 28%;
+  top: 22%;
   left: 50%;
 }
 .app-icon[data-index="1"] {
-  top: 40%;
-  left: 32%;
+  top: 35%;
+  left: 30%;
 }
 .app-icon[data-index="2"] {
-  top: 40%;
-  left: 68%;
+  top: 35%;
+  left: 70%;
 }
 
 /* Highlighted state — scale + rotation driven by --focus-intensity (set by JS on scroll) */
@@ -512,11 +512,11 @@ a.app-tooltip__name:hover {
 /* ── Alex stick figure next to tree ── */
 #alex {
   position: absolute;
-  bottom: 7.5%;
-  left: 65%;
+  bottom: 3%;
+  left: 50%;
   height: 18%;
   cursor: pointer;
-  z-index: 5;
+  z-index: -1;
 }
 
 #alex img {
@@ -568,11 +568,11 @@ a.app-tooltip__name:hover {
 /* ── Rocket launch animation ── */
 #thrust {
   position: absolute;
-  top: 95%;
-  left: 49%;
+  top: 99%;
+  left: 50%;
   transform: translateX(-50%) scaleY(1.4);
   transform-origin: top center;
-  width: 22%;
+  width: 35%;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.3s ease;
@@ -616,6 +616,23 @@ a.app-tooltip__name:hover {
   transform: translate(-50%, -50%);
   z-index: 100;
   pointer-events: none;
+}
+
+#fallback-link {
+  display: none;
+  position: fixed;
+  bottom: 40%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 200;
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-size: 1rem;
+  color: #1a1a1a;
+}
+
+#fallback-link a {
+  color: #1a1a1a;
+  text-decoration: underline;
 }
 
 #screenshot-bg.fade-out {
@@ -679,7 +696,7 @@ a.app-tooltip__name:hover {
   }
 
   .app-icon {
-    width: 9%;
+    width: 14%;
   }
 
   .app-tooltip {
