@@ -266,8 +266,8 @@ body {
   height: auto;
   flex-shrink: 0;
   border-radius: 12px;
-  opacity: 0.4;
-  filter: saturate(0.88);
+  opacity: 0.75;
+  filter: saturate(0.95);
   user-select: none;
   -webkit-user-drag: none;
   pointer-events: none;
