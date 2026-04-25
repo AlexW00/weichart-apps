@@ -1,5 +1,7 @@
 import "./style.css";
 
+let rocketLaunched = false;
+
 // ── Typing animation for "Humans" ──
 const words = ["Humans", "Menschen", "人間", "Cats?"];
 let wordIndex = 0;
@@ -198,6 +200,7 @@ function kickCloudMarquee() {
 let cloudLayerFullyFaded = false;
 
 function updateScene() {
+	if (rocketLaunched) return;
 	const progress = maxScroll > 0 ? Math.min(window.scrollY / maxScroll, 1) : 0;
 
 	// Scroll 0→1 = tree grows to full size (page height matches this range only)
@@ -397,6 +400,159 @@ const alexEl = document.getElementById("alex")!;
 const alexUrl = "https://alexanderweichart.de/1_Home/About--and--Contact";
 let alexTouchOpen = false;
 
+// ── Rocket launch sequence ──
+function launchSequence() {
+	if (rocketLaunched) return;
+	rocketLaunched = true;
+
+
+	const thrustEl = document.getElementById("thrust")!;
+	const scene = document.getElementById("scene")!;
+
+	// Snapshot the current tree transform so we can continue from it
+	const currentTransform = treeContainer.style.transform;
+
+	// Phase 1 (0ms): Screenshots fade out, tooltip changes to "?!"
+	screenshotBg.classList.add("fade-out");
+	const alexTooltipName = alexEl.querySelector(".app-tooltip__name") as HTMLElement;
+	const alexTooltipSub = alexEl.querySelector(".app-tooltip__subtitle") as HTMLElement;
+	if (alexTooltipName) alexTooltipName.textContent = "?!";
+	if (alexTooltipSub) alexTooltipSub.textContent = "";
+	alexEl.classList.add("alex-surprised");
+
+	// Phase 2 (200ms): Alex runs off-screen + hide all app tooltips
+	setTimeout(() => {
+		alexEl.classList.add("alex-running");
+		alexEl.classList.remove("is-touch-open");
+		appIcons.forEach((icon) => {
+			icon.classList.remove("highlighted", "is-touch-open");
+			icon.classList.add("hide-tooltip");
+		});
+
+		// Calculate distance to right edge of screen from Alex's position
+		const alexRect = alexEl.getBoundingClientRect();
+		const runDistance = window.innerWidth - alexRect.left + alexRect.width;
+		const runDuration = 1200; // finish before tree launches
+		const runStart = performance.now();
+
+		function alexRunLoop(now: number) {
+			const elapsed = now - runStart;
+			const t = Math.min(elapsed / runDuration, 1);
+			const eased = t * t; // accelerating
+			const x = eased * runDistance;
+			const wobbleY = Math.sin(t * Math.PI * 6) * 8 * (1 - t);
+			const wobbleR = Math.sin(t * Math.PI * 5) * 4 * (1 - t);
+			alexEl.style.transform = `translateX(${x}px) translateY(${wobbleY}px) rotate(${wobbleR}deg)`;
+			if (t >= 1) {
+				alexEl.style.display = "none";
+				return;
+			}
+			requestAnimationFrame(alexRunLoop);
+		}
+		requestAnimationFrame(alexRunLoop);
+	}, 200);
+
+	// Phase 3 (500ms): Thrust appears
+	setTimeout(() => {
+		thrustEl.classList.add("visible");
+	}, 500);
+
+	// Phase 4 (600ms): Screen rumble (rAF-driven, 1.5s)
+	setTimeout(() => {
+		const rumbleStart = performance.now();
+		const rumbleDuration = 900;
+
+		function rumbleLoop(now: number) {
+			const elapsed = now - rumbleStart;
+			if (elapsed >= rumbleDuration) {
+				scene.style.transform = "";
+				startLaunch();
+				return;
+			}
+			const progress = elapsed / rumbleDuration;
+			const amplitude = 1 + progress * 3;
+			const rx = (Math.random() - 0.5) * 2 * amplitude;
+			const ry = (Math.random() - 0.5) * 2 * amplitude;
+			scene.style.transform = `translate(${rx}px, ${ry}px)`;
+			requestAnimationFrame(rumbleLoop);
+		}
+		requestAnimationFrame(rumbleLoop);
+	}, 600);
+
+	// Phase 5: Tree launches upward + background fades to black
+	function startLaunch() {
+		// Fade background to black, hide clouds and sky
+		const overlay = document.getElementById("launch-overlay")!;
+		let fadeStarted = false;
+		const launchStart = performance.now();
+		const launchDuration = 1200;
+
+		// Parse current transform values
+		const match = currentTransform.match(
+			/translateY\(([^)]+)vh\)\s*scale\(([^)]+)\)/,
+		);
+		const baseOffsetVh = match ? parseFloat(match[1]) : 5;
+		const baseScale = match ? parseFloat(match[2]) : 1;
+		const scene = document.getElementById("scene")!;
+
+		function launchLoop(now: number) {
+			const elapsed = now - launchStart;
+			const t = Math.min(elapsed / launchDuration, 1);
+
+			// Fade to black when tree is halfway gone
+			if (t >= 0.5 && !fadeStarted) {
+				fadeStarted = true;
+				overlay.classList.add("active");
+				cloudsEl.style.transition = "opacity 0.6s ease";
+				cloudsEl.style.opacity = "0";
+				skyGradient.style.transition = "opacity 0.6s ease";
+				skyGradient.style.opacity = "0";
+			}
+
+			// Quadratic easing (accelerating upward)
+			const displacement = t * t * 250;
+
+			treeContainer.style.transform =
+				`translateX(-50%) translateY(${baseOffsetVh - displacement}vh) scale(${baseScale})`;
+
+			// Diminishing rumble during launch
+			const rumbleAmp = (1 - t) * 2;
+			const rx = (Math.random() - 0.5) * 2 * rumbleAmp;
+			const ry = (Math.random() - 0.5) * 2 * rumbleAmp;
+			scene.style.transform = `translate(${rx}px, ${ry}px)`;
+
+			if (t >= 1) {
+				scene.style.transform = "";
+				// Pause on black, then white circle wipe, then navigate
+				setTimeout(() => {
+					const wipe = document.getElementById("launch-wipe")!;
+					const maxDim = Math.max(window.innerWidth, window.innerHeight) * 2.5;
+					const wipeDuration = 600;
+					const wipeStart = performance.now();
+
+					function wipeLoop(now: number) {
+						const elapsed = now - wipeStart;
+						const wt = Math.min(elapsed / wipeDuration, 1);
+						const eased = 1 - (1 - wt) ** 3; // easeOutCubic
+						const size = eased * maxDim;
+						wipe.style.width = `${size}px`;
+						wipe.style.height = `${size}px`;
+						if (wt >= 1) {
+							window.location.href = alexUrl;
+							return;
+						}
+						requestAnimationFrame(wipeLoop);
+					}
+					requestAnimationFrame(wipeLoop);
+				}, 500);
+				return;
+			}
+			requestAnimationFrame(launchLoop);
+		}
+		requestAnimationFrame(launchLoop);
+	}
+}
+
 if (!touchToggle) {
 	alexEl.addEventListener("mouseenter", () => {
 		appIcons.forEach((i) => i.classList.add("hide-tooltip"));
@@ -405,13 +561,13 @@ if (!touchToggle) {
 		appIcons.forEach((i) => i.classList.remove("hide-tooltip"));
 	});
 	alexEl.addEventListener("click", () => {
-		window.open(alexUrl, "_blank", "noopener");
+		launchSequence();
 	});
 } else {
 	alexEl.addEventListener("click", (e) => {
 		e.stopPropagation();
 		if (alexTouchOpen) {
-			window.open(alexUrl, "_blank", "noopener");
+			launchSequence();
 			return;
 		}
 		alexTouchOpen = true;

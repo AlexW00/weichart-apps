@@ -565,6 +565,81 @@ a.app-tooltip__name:hover {
   }
 }
 
+/* ── Rocket launch animation ── */
+#thrust {
+  position: absolute;
+  top: 95%;
+  left: 49%;
+  transform: translateX(-50%) scaleY(1.4);
+  transform-origin: top center;
+  width: 22%;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: -1;
+}
+
+#thrust.visible {
+  opacity: 1;
+}
+
+@media (max-width: 768px) {
+  #thrust {
+    top: 98%;
+  }
+}
+
+/* Dark overlay for rocket launch */
+#launch-overlay {
+  position: fixed;
+  inset: 0;
+  background: black;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 2;
+  transition: opacity 1s ease;
+}
+
+#launch-overlay.active {
+  opacity: 1;
+}
+
+/* White circle wipe transition */
+#launch-wipe {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: white;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 100;
+  pointer-events: none;
+}
+
+#screenshot-bg.fade-out {
+  opacity: 0 !important;
+  transition: opacity 0.4s ease;
+}
+
+#alex.alex-running {
+  pointer-events: none;
+}
+
+#alex.alex-running .app-tooltip {
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+
+/* Surprised tooltip override */
+#alex.alex-surprised .app-tooltip {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: none;
+}
+
 /* ── Mobile only (keeps desktop title + subtitle geometry unchanged) ── */
 @media (max-width: 600px) {
   #title {
