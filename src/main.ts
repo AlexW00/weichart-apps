@@ -368,6 +368,11 @@ appIcons.forEach((icon) => {
 		// If animation hasn't played, first tap scrolls down + selects
 		icon.addEventListener("click", (e) => {
 			e.stopPropagation();
+			// Dismiss Alex tooltip when tapping an app
+			alexEl.classList.remove("is-touch-open");
+			alexTouchOpen = false;
+			appIcons.forEach((i) => i.classList.remove("hide-tooltip"));
+
 			if (!isAnimationComplete()) {
 				scrollAndFocus(index);
 				appIcons.forEach((i) => i.classList.remove("is-touch-open"));
@@ -387,10 +392,46 @@ appIcons.forEach((icon) => {
 	}
 });
 
+// ── Alex interaction (tooltip + link, hides app tooltips on hover) ──
+const alexEl = document.getElementById("alex")!;
+const alexUrl = "https://alexanderweichart.de/1_Home/About--and--Contact";
+let alexTouchOpen = false;
+
+if (!touchToggle) {
+	alexEl.addEventListener("mouseenter", () => {
+		appIcons.forEach((i) => i.classList.add("hide-tooltip"));
+	});
+	alexEl.addEventListener("mouseleave", () => {
+		appIcons.forEach((i) => i.classList.remove("hide-tooltip"));
+	});
+	alexEl.addEventListener("click", () => {
+		window.open(alexUrl, "_blank", "noopener");
+	});
+} else {
+	alexEl.addEventListener("click", (e) => {
+		e.stopPropagation();
+		if (alexTouchOpen) {
+			window.open(alexUrl, "_blank", "noopener");
+			return;
+		}
+		alexTouchOpen = true;
+		alexEl.classList.add("is-touch-open");
+		appIcons.forEach((i) => {
+			i.classList.remove("is-touch-open");
+			i.classList.add("hide-tooltip");
+		});
+	});
+}
+
 // Mobile: background tap dismisses tooltip but keeps selection
 if (touchToggle) {
 	document.addEventListener("click", () => {
-		appIcons.forEach((i) => i.classList.remove("is-touch-open"));
+		appIcons.forEach((i) => {
+			i.classList.remove("is-touch-open");
+			i.classList.remove("hide-tooltip");
+		});
+		alexEl.classList.remove("is-touch-open");
+		alexTouchOpen = false;
 	});
 }
 

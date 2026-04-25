@@ -273,6 +273,7 @@ body {
   pointer-events: none;
 }
 
+
 /* ── Mobile: two vertical screenshot lanes above tree (shown on app-icon tap) ── */
 @media (max-width: 768px) {
   body {
@@ -492,6 +493,12 @@ a.app-tooltip__name:hover {
   display: none;
 }
 
+/* Hide app tooltip when Alex is hovered (screenshots stay visible) */
+.app-icon.hide-tooltip .app-tooltip {
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
 .app-icon:focus {
   outline: none;
 }
@@ -500,6 +507,58 @@ a.app-tooltip__name:hover {
   outline: 2px solid var(--humans-color);
   outline-offset: 4px;
   border-radius: 22%;
+}
+
+/* ── Alex stick figure next to tree ── */
+#alex {
+  position: absolute;
+  bottom: 7.5%;
+  left: 65%;
+  height: 18%;
+  cursor: pointer;
+  z-index: 5;
+}
+
+#alex img {
+  height: 100%;
+  width: auto;
+  display: block;
+  transition: transform 0.3s ease;
+  transform-origin: bottom center;
+}
+
+@media (hover: hover) {
+  #alex:hover img {
+    animation: alex-jump 0.4s ease 1;
+  }
+}
+
+@keyframes alex-jump {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  40% { transform: translateY(-6%) rotate(-1.5deg); }
+  70% { transform: translateY(-2%) rotate(0.5deg); }
+}
+
+/* Alex tooltip — shown above */
+#alex .app-tooltip {
+  bottom: calc(100% + 0.5rem);
+}
+
+#alex:focus-visible .app-tooltip,
+#alex.is-touch-open .app-tooltip {
+  opacity: var(--focus-intensity, 0);
+  visibility: visible;
+  pointer-events: auto;
+  transform: translate3d(-50%, calc((1 - var(--focus-intensity, 0)) * 6px), 0);
+}
+
+@media (hover: hover) {
+  #alex:hover .app-tooltip {
+    opacity: var(--focus-intensity, 0);
+    visibility: visible;
+    pointer-events: auto;
+    transform: translate3d(-50%, calc((1 - var(--focus-intensity, 0)) * 6px), 0);
+  }
 }
 
 /* ── Mobile only (keeps desktop title + subtitle geometry unchanged) ── */
