@@ -648,6 +648,10 @@ document.addEventListener("visibilitychange", () => {
 window.addEventListener("pageshow", (e: PageTransitionEvent) => {
 	if (e.persisted) {
 		kickCloudMarquee();
+		// Reset page if coming back after rocket launch
+		if (rocketLaunched) {
+			window.location.reload();
+		}
 	}
 });
 
