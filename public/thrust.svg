@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="472px" height="747px" viewBox="0 0 472 747" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Group</title>
+    <defs>
+        <linearGradient x1="50.0001143%" y1="0%" x2="50.0001143%" y2="100%" id="linearGradient-1">
+            <stop stop-color="#340B05" offset="0%"></stop>
+            <stop stop-color="#0358F7" offset="18.2709%"></stop>
+            <stop stop-color="#5092C7" offset="28.3673%"></stop>
+            <stop stop-color="#E1ECFE" offset="41.3484%"></stop>
+            <stop stop-color="#FFD400" offset="58.6565%"></stop>
+            <stop stop-color="#FA3D1D" offset="68.2722%"></stop>
+            <stop stop-color="#FA3D1D" stop-opacity="0" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-2">
+            <stop stop-color="#340B05" offset="0%"></stop>
+            <stop stop-color="#0358F7" offset="18.2709%"></stop>
+            <stop stop-color="#5092C7" offset="28.3673%"></stop>
+            <stop stop-color="#E1ECFE" offset="41.3484%"></stop>
+            <stop stop-color="#FFD400" offset="58.6565%"></stop>
+            <stop stop-color="#FA3D1D" offset="68.2722%"></stop>
+            <stop stop-color="#FA3D1D" stop-opacity="0" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="50.0001156%" y1="0%" x2="50.0001156%" y2="100%" id="linearGradient-3">
+            <stop stop-color="#340B05" offset="0%"></stop>
+            <stop stop-color="#0358F7" offset="18.2709%"></stop>
+            <stop stop-color="#5092C7" offset="28.3673%"></stop>
+            <stop stop-color="#E1ECFE" offset="41.3484%"></stop>
+            <stop stop-color="#FFD400" offset="58.6565%"></stop>
+            <stop stop-color="#FA3D1D" offset="68.2722%"></stop>
+            <stop stop-color="#FA3D1D" stop-opacity="0" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="flyoff-copy" transform="translate(-239, -41)">
+            <g id="Group" transform="translate(475, 414.5) rotate(180) translate(-475, -414.5)translate(239, 41)">
+                <polygon id="Rectangle" fill="url(#linearGradient-1)" transform="translate(90.3721, 408.036) scale(-1, 1) rotate(-180) translate(-90.3721, -408.036)" points="0.000127540843 69.0719737 180.743981 69.0720003 180.744061 746.999951 0.000208129515 746.999924"></polygon>
+                <rect id="Rectangle" fill="url(#linearGradient-2)" transform="translate(381.6281, 408.036) rotate(180) translate(-381.6281, -408.036)" x="291.256146" y="69.0719806" width="180.743853" height="677.92795"></rect>
+                <polygon id="Rectangle" fill="url(#linearGradient-3)" transform="translate(236, 373.5) scale(-1, 1) rotate(-180) translate(-236, -373.5)" points="146.660833 6.16906756e-05 325.339042 8.79960334e-05 325.339131 746.999943 146.660922 746.999916"></polygon>
+            </g>
+        </g>
+    </g>
+</svg>
