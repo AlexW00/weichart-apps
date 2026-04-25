@@ -265,7 +265,7 @@ function updateScene() {
 	// Alex walks out from behind the tree — starts at eased 0.3, finishes at eased 1.0
 	const alexT = eased > 0.3 ? Math.min((eased - 0.3) / 0.7, 1) : 0;
 	const alexLeft = 50 + alexT * 20;
-	const alexZIndex = alexT >= 1 ? 5 : -1;
+	const alexZIndex = alexT >= 0.85 ? 5 : -1;
 	const wobbleRotate = alexT < 1
 		? Math.sin(alexT * Math.PI * 10) * 5 * (1 - alexT)
 		: 0;
@@ -572,13 +572,25 @@ function launchSequence() {
 	}
 }
 
+/** Quickly auto-scroll to the bottom (if needed), then launch the rocket. */
+function scrollAndLaunch() {
+	const scrollRemaining = maxScroll - window.scrollY;
+	if (scrollRemaining <= 5) {
+		launchSequence();
+		return;
+	}
+	const duration = Math.min(500, Math.max(200, scrollRemaining));
+	animateScroll(maxScroll, duration);
+	setTimeout(() => launchSequence(), duration);
+}
+
 // Intercept clicks on Alex's tooltip link — trigger launch instead of navigating
 const alexTooltipLink = alexEl.querySelector(".app-tooltip__name");
 if (alexTooltipLink) {
 	alexTooltipLink.addEventListener("click", (e) => {
 		e.preventDefault();
 		e.stopPropagation();
-		launchSequence();
+		scrollAndLaunch();
 	});
 }
 
@@ -590,13 +602,13 @@ if (!touchToggle) {
 		appIcons.forEach((i) => i.classList.remove("hide-tooltip"));
 	});
 	alexEl.addEventListener("click", () => {
-		launchSequence();
+		scrollAndLaunch();
 	});
 } else {
 	alexEl.addEventListener("click", (e) => {
 		e.stopPropagation();
 		if (alexTouchOpen) {
-			launchSequence();
+			scrollAndLaunch();
 			return;
 		}
 		alexTouchOpen = true;
