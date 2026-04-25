@@ -314,11 +314,39 @@ const touchToggle =
 
 let selectedAppIndex = 0;
 
+/** Whether the scroll animation has fully played (scroll near bottom). */
+function isAnimationComplete(): boolean {
+	return maxScroll > 0 && window.scrollY / maxScroll > 0.85;
+}
+
+/** Animated scroll to a target position over a given duration (ms). */
+function animateScroll(target: number, duration: number) {
+	const start = window.scrollY;
+	const delta = target - start;
+	if (delta === 0) return;
+	const startTime = performance.now();
+
+	function step(now: number) {
+		const t = Math.min((now - startTime) / duration, 1);
+		const eased = t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2; // easeInOutCubic
+		window.scrollTo(0, start + delta * eased);
+		if (t < 1) requestAnimationFrame(step);
+	}
+	requestAnimationFrame(step);
+}
+
+/** Scroll to the bottom to play the full animation, then highlight the app. */
+function scrollAndFocus(index: number) {
+	selectedAppIndex = index;
+	setAppHighlight(index);
+	animateScroll(maxScroll, 1800);
+}
+
 appIcons.forEach((icon) => {
 	const index = parseInt(icon.dataset.index ?? "-1", 10);
 
 	if (!touchToggle) {
-		// Desktop: hover selects app, click opens its URL
+		// Desktop: hover selects app, click opens its URL (or scrolls first if at top)
 		icon.addEventListener("mouseenter", () => {
 			selectedAppIndex = index;
 			setAppHighlight(index);
@@ -328,13 +356,24 @@ appIcons.forEach((icon) => {
 			setAppHighlight(index);
 		});
 		icon.addEventListener("click", () => {
+			if (!isAnimationComplete()) {
+				scrollAndFocus(index);
+				return;
+			}
 			const url = icon.dataset.url;
 			if (url) window.open(url, "_blank", "noopener");
 		});
 	} else {
 		// Mobile: first tap selects + shows tooltip, second tap opens URL
+		// If animation hasn't played, first tap scrolls down + selects
 		icon.addEventListener("click", (e) => {
 			e.stopPropagation();
+			if (!isAnimationComplete()) {
+				scrollAndFocus(index);
+				appIcons.forEach((i) => i.classList.remove("is-touch-open"));
+				icon.classList.add("is-touch-open");
+				return;
+			}
 			if (selectedAppIndex === index) {
 				const url = icon.dataset.url;
 				if (url) window.open(url, "_blank", "noopener");
