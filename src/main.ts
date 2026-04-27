@@ -373,7 +373,7 @@ appIcons.forEach((icon) => {
 			setAppHighlight(index);
 		});
 		icon.addEventListener("click", () => {
-			if (!isAnimationComplete()) {
+			if (selectedAppIndex !== index && !isAnimationComplete()) {
 				scrollAndFocus(index);
 				return;
 			}
@@ -390,15 +390,15 @@ appIcons.forEach((icon) => {
 			alexTouchOpen = false;
 			appIcons.forEach((i) => i.classList.remove("hide-tooltip"));
 
+			if (selectedAppIndex === index) {
+				const url = icon.dataset.url;
+				if (url) window.open(url, "_blank", "noopener");
+				return;
+			}
 			if (!isAnimationComplete()) {
 				scrollAndFocus(index);
 				appIcons.forEach((i) => i.classList.remove("is-touch-open"));
 				icon.classList.add("is-touch-open");
-				return;
-			}
-			if (selectedAppIndex === index) {
-				const url = icon.dataset.url;
-				if (url) window.open(url, "_blank", "noopener");
 				return;
 			}
 			selectedAppIndex = index;
