@@ -17,9 +17,9 @@ const APPS: AppInfo[] = [
 		description: "Minimalist Quick Notes",
 	},
 	{
-		icon: "zeitgeist-icon.png",
-		name: "Zeitgeist",
-		description: "Screen Time, Reimagined",
+		icon: "marble-icon.png",
+		name: "Marble",
+		description: "Budget Jars & Savings Goals",
 	},
 	{ icon: "next-icon.png", name: "?", description: "Coming Soon" },
 ];
