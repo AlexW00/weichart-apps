@@ -736,7 +736,7 @@ a.app-tooltip__name:hover {
   position: fixed;
   left: 16px;
   right: 16px;
-  bottom: calc(24px + env(safe-area-inset-bottom));
+  top: calc(16px + env(safe-area-inset-top));
   z-index: 1000;
   padding: 14px 18px;
   border-radius: 16px;

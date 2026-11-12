@@ -356,8 +356,47 @@ function animateScroll(target: number, duration: number) {
 // TikTok and Instagram's in-app browsers block App Store pages ("Action could not
 // be completed"), so hand the link to Safari and explain the manual way out if that's
 // blocked too.
-const inAppBrowser = /musical_ly|BytedanceWebview|TikTok|Instagram|FBAN|FBAV/i.test(navigator.userAgent);
+const ua = navigator.userAgent;
+// Known in-app browsers, plus any iOS web view that lacks Safari's own "Safari/" token.
+const inAppBrowser =
+	/musical_ly|BytedanceWebview|TikTok|trill|Instagram|FBAN|FBAV/i.test(ua) ||
+	(/iPhone|iPad|iPod/.test(ua) && !/Safari\//.test(ua));
 const inAppHint = document.getElementById("in-app-hint")!;
+if (inAppBrowser) inAppHint.hidden = false;
+
+// ── App Store campaign attribution ──
+// Bio links carry ?c=<platform> (e.g. apps.weichart.de/?c=tiktok). Every App Store link
+// on the page gets that as its App Analytics campaign, so downloads show up per platform
+// under Acquisition → Campaigns. Without ?c=, fall back to the in-app browser, then to
+// the site itself.
+const APP_STORE_PROVIDER_TOKEN = "127977684";
+const requestedCampaign = (new URLSearchParams(location.search).get("c") ?? "")
+	.toLowerCase()
+	.replace(/[^a-z0-9_-]/g, "")
+	.slice(0, 30);
+const campaign =
+	requestedCampaign ||
+	(/musical_ly|BytedanceWebview|TikTok|trill/i.test(ua)
+		? "tiktok"
+		: /Instagram/i.test(ua)
+			? "instagram"
+			: "apps_site");
+
+function withCampaign(url: string): string {
+	if (!url.startsWith("https://apps.apple.com/")) return url;
+	const tagged = new URL(url);
+	tagged.searchParams.set("pt", APP_STORE_PROVIDER_TOKEN);
+	tagged.searchParams.set("ct", campaign);
+	tagged.searchParams.set("mt", "8");
+	return tagged.toString();
+}
+
+document.querySelectorAll<HTMLElement>("[data-url]").forEach((el) => {
+	el.dataset.url = withCampaign(el.dataset.url ?? "");
+});
+document.querySelectorAll<HTMLAnchorElement>('a[href^="https://apps.apple.com/"]').forEach((link) => {
+	link.href = withCampaign(link.href);
+});
 
 function openAppLink(url: string) {
 	if (!inAppBrowser || !url.startsWith("https://apps.apple.com/")) {
