@@ -352,6 +352,33 @@ function animateScroll(target: number, duration: number) {
 	requestAnimationFrame(step);
 }
 
+// ── App Store links inside in-app browsers ──
+// TikTok and Instagram's in-app browsers block App Store pages ("Action could not
+// be completed"), so hand the link to Safari and explain the manual way out if that's
+// blocked too.
+const inAppBrowser = /musical_ly|BytedanceWebview|TikTok|Instagram|FBAN|FBAV/i.test(navigator.userAgent);
+const inAppHint = document.getElementById("in-app-hint")!;
+
+function openAppLink(url: string) {
+	if (!inAppBrowser || !url.startsWith("https://apps.apple.com/")) {
+		window.open(url, "_blank", "noopener");
+		return;
+	}
+	window.location.href = "x-safari-" + url;
+	setTimeout(() => {
+		if (document.visibilityState === "visible") inAppHint.hidden = false;
+	}, 1200);
+}
+
+document.querySelectorAll<HTMLAnchorElement>('.app-tooltip__name[href^="https://apps.apple.com/"]').forEach((link) => {
+	link.addEventListener("click", (e) => {
+		if (!inAppBrowser) return;
+		e.preventDefault();
+		e.stopPropagation();
+		openAppLink(link.href);
+	});
+});
+
 /** Scroll to the bottom to play the full animation, then highlight the app. */
 function scrollAndFocus(index: number) {
 	selectedAppIndex = index;
@@ -378,7 +405,7 @@ appIcons.forEach((icon) => {
 				return;
 			}
 			const url = icon.dataset.url;
-			if (url) window.open(url, "_blank", "noopener");
+			if (url) openAppLink(url);
 		});
 	} else {
 		// Mobile: first tap selects + shows tooltip, second tap opens URL
@@ -392,7 +419,7 @@ appIcons.forEach((icon) => {
 
 			if (selectedAppIndex === index) {
 				const url = icon.dataset.url;
-				if (url) window.open(url, "_blank", "noopener");
+				if (url) openAppLink(url);
 				return;
 			}
 			if (!isAnimationComplete()) {
