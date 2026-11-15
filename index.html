@@ -32,6 +32,16 @@
 		<meta name="twitter:image" content="https://apps.weichart.de/android-chrome-512x512.png" />
 		<!-- Ackee Analytics -->
 		<script async src="https://ackee.weichart.de/tracker.js" data-ackee-server="https://ackee.weichart.de" data-ackee-domain-id="575243a2-811d-4ca2-9aa7-52e2bbc0cb1c"></script>
+		<!-- TikTok bio link (?c=tiktok) lands on the grown tree: hide the scene and freeze transitions
+		     until main.ts has jumped there, so nothing visibly moves. Timeout is a failsafe if it never runs. -->
+		<script>
+			if ((new URLSearchParams(location.search).get("c") || "").toLowerCase() === "tiktok") {
+				document.documentElement.classList.add("land-on-tree");
+				setTimeout(function () {
+					document.documentElement.classList.remove("land-on-tree");
+				}, 3000);
+			}
+		</script>
 	</head>
 	<body>
 		<div id="scene">

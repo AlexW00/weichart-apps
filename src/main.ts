@@ -748,6 +748,38 @@ window.addEventListener("resize", () => {
 
 tileCloudStrip();
 window.addEventListener("load", () => {
+	updateCachedDimensions();
 	tileCloudStrip();
+	updateScene();
 });
 updateScene();
+
+function revealScene() {
+	requestAnimationFrame(() => {
+		requestAnimationFrame(() => {
+			document.documentElement.classList.remove("land-on-tree");
+		});
+	});
+}
+
+// TikTok bio link (?c=tiktok): open already scrolled to the grown tree with Hibi selected,
+// so the download is one tap away. Jump, never animate; index.html hid the scene for this.
+// The stylesheet can still be pending here (page not yet 200vh), so wait for it per frame.
+const sceneEl = document.getElementById("scene")!;
+function landOnTree(framesLeft: number) {
+	const stylesApplied = getComputedStyle(sceneEl).position === "fixed";
+	if (!stylesApplied && framesLeft > 0) {
+		requestAnimationFrame(() => landOnTree(framesLeft - 1));
+		return;
+	}
+	updateCachedDimensions();
+	window.scrollTo(0, maxScroll);
+	updateScene();
+	revealScene();
+}
+
+if (requestedCampaign === "tiktok") {
+	landOnTree(120);
+} else {
+	revealScene();
+}
