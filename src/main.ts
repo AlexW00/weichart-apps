@@ -762,7 +762,7 @@ function revealScene() {
 	});
 }
 
-// TikTok bio link (?c=tiktok): open already scrolled to the grown tree with Hibi selected,
+// Bio links (?c=tiktok, ?c=x): open already scrolled to the grown tree with Hibi selected,
 // so the download is one tap away. Jump, never animate; index.html hid the scene for this.
 // The stylesheet can still be pending here (page not yet 200vh), so wait for it per frame.
 const sceneEl = document.getElementById("scene")!;
@@ -778,7 +778,9 @@ function landOnTree(framesLeft: number) {
 	revealScene();
 }
 
-if (requestedCampaign === "tiktok") {
+// Keep in sync with the inline script in index.html.
+const LAND_ON_TREE_CAMPAIGNS = ["tiktok", "x"];
+if (LAND_ON_TREE_CAMPAIGNS.includes(requestedCampaign)) {
 	landOnTree(120);
 } else {
 	revealScene();
